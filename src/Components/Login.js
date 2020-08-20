@@ -23,8 +23,8 @@ const Login = (props) =>
 
     let { from } = location.state || { from: { pathname: "/" } };
 	const onSubmit = async data => {
-		await dispatch(user_attempt_login(data,props));
-		if(Object.keys(user).length > 0) history.replace(from);
+		await dispatch(user_attempt_login(data,history,from));
+		//if(Object.keys(user).length > 0) history.replace(from);
 	}
 
 	useEffect(() => {
@@ -37,6 +37,11 @@ const Login = (props) =>
 		     <div className="container-login100">
 			<div className="wrap-login100">
 				<form onSubmit={handleSubmit(onSubmit)} className="login100-form validate-form">
+				<div style={{textAlign:'center',marginBottom:20}}>
+					<div className="logo">
+						<Link to ="/"><img src="../../img/core-img/logo.png" alt=""/></Link>
+					</div>
+				</div>
 					<span className="login100-form-title p-b-43">
 						Login to continue
 					</span>
@@ -77,11 +82,11 @@ const Login = (props) =>
 							</label> */}
 						</div>
 
-						<div>
+						{/* <div>
 							<a href="#" className="txt1">
 								Forgot Password?
 							</a>
-						</div>
+						</div> */}
 					</div>
 			
 

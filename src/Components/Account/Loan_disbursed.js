@@ -27,6 +27,7 @@ const Loandisbursed = (props) =>
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
     const month = useSelector(state => state.root.month);
+    const type = 'lender';
     
     useEffect(() => {
         process();
@@ -66,7 +67,7 @@ const Loandisbursed = (props) =>
                     </div>
                     <div className="">
                         <div id="">
-                        { Object.keys(request).length > 0 && <Request request = {request} />   }
+                        { Object.keys(request).length > 0 && <Request request = {request} type = {type} />   }
                         
                         </div>
                     </div>

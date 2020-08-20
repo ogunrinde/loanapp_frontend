@@ -27,6 +27,12 @@ const SureVault = (props) =>
 {
     const { handleSubmit, register, errors } = useForm();
     const dispatch = useDispatch();
+    const userdetails = useSelector(state => state.root.userbasicdetails);
+    const userhomeaddress = useSelector(state => state.root.userHomeAddress);
+    const userofficeaddress = useSelector(state => state.root.userOfficeAddress);
+    const usersocialmedia = useSelector(state => state.root.userSocialMediaAccounts);
+    const bankdetail = useSelector(state => state.root.userBankInformation);
+    const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
     const countries = useSelector(state => state.places.countries);
@@ -56,6 +62,13 @@ const SureVault = (props) =>
                         <div class="col-12">
                             <div class="breadcrumb-content">
                                 <h2>Sure Vault Creation</h2>
+                                {
+                                   (userdetails != null ||
+                                    userhomeaddress != null ||
+                                    userofficeaddress != null ||
+                                    usersocialmedia != null ||
+                                    bankdetail != null || userdetails.Is_phone_number_verified != 0 || userdetails.Is_email_verified != 0) && <div style={{color:'#fff',marginTop:20,fontSize:17}}>Please Complete your registration to create a vault</div>
+                                }
                                 
                             </div>
                         </div>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect} from 'react';
 import '../css/css/profile.css';
 import { useForm } from "react-hook-form";
-import { places, countrystates } from '../Components/redux/action/index';
+import { places, countrystates, Getcities } from '../Components/redux/action/index';
 import { useSelector, useDispatch } from 'react-redux'; 
 import { userbasicInfo, UserhomeAddress, UserOfficeAddress } from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
@@ -18,6 +18,9 @@ const OfficeInfo = (props) =>
     const IsFetching = useSelector(state => state.root.IsFetching);
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
+    const [ isLoadingCities, setisLoadingCities] = useState(false);
+    const codes = useSelector(state => state.root.codes);
+    const cities = useSelector(state => state.root.cities);
 
 
     useEffect(() =>{
@@ -36,9 +39,18 @@ const OfficeInfo = (props) =>
 
 
     const onSubmit = async (data) => {
+        //alert(JSON.stringify(data));
+       data.contact_number = `${data.mobile1code}${data.contact_number}`; 
        await dispatch(UserOfficeAddress(data));
        props.nextStep();
     }
+
+    const handleState = (event) => {
+        setisLoadingCities(true);
+        dispatch(Getcities(event.target.value));
+        setisLoadingCities(false);
+    }
+
 
     
     return(
@@ -88,17 +100,45 @@ const OfficeInfo = (props) =>
                    
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
-                        <input 
-                            placeholder="Contact Number" 
-                            type="text" 
-                            tabindex="1" 
-                            autofocus
-                            name="contact_number"
-                            ref={register({
-                                required: "Required"
-                            })}
-                        />
-                        <small className="text-danger">{errors.contact_number?.type == "required" && "Company Phone Number is required"}</small>
+                        <div className="row no-gutters">
+                               <div className="col-lg-5 col-sm-5 col-md-5">
+                                 <select 
+                                    name="mobile1code"
+                                    style={{height:45,color:'#777777'}}
+                                    ref={register({
+                                        required: "Required",
+                                    })}
+                                 >
+                                 <option value="">Phone Code</option>   
+                                    {
+                                        codes != null &&
+                                        codes.map((code) => 
+                                            <option value={code.code}>{code.name}</option>
+                                        )
+                                    }
+                                    
+                                 </select> 
+                                 <small className="text-danger">{errors.mobile1code?.type == "required" && "Phone Code is Required"}</small><br/>
+
+                               </div>
+                               <div className="col-lg-1 col-sm-1 col-md-1"></div>
+                               <div className="col-lg-6 col-sm-6 col-md-6">
+                               <input 
+                                    placeholder="Contact Number" 
+                                    type="text" 
+                                    tabindex="1" 
+                                    autofocus
+                                    name="contact_number"
+                                    ref={register({
+                                        required: "Required",
+                                        min:100,
+                                        max:999999999999
+                                    })}
+                                />
+                                <small className="text-danger">{errors.contact_number?.type == "required" && "Company Phone Number is required"}</small>
+                                <small className="text-danger">{(errors.contact_number?.type == "min" || errors.contact_number?.type == "max") && "Invalid Phone Number"}</small>
+                               </div>
+                          </div>  
                         </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
@@ -133,6 +173,7 @@ const OfficeInfo = (props) =>
                                 >
                                 <option value ="">Select your Country</option>
                                     {
+                                        countries != null &&
                                         countries.map((country) =>
                                         <option value ={country.id}>{ country.name }</option>
                                     )}
@@ -146,6 +187,7 @@ const OfficeInfo = (props) =>
                     <fieldset>
                             <select 
                                 name="state_id"
+                                onChange = {(text) => handleState(text)}
                                 style={{color:'#777777'}}    
                                 ref={register({
                                     required: "Required",
@@ -153,6 +195,7 @@ const OfficeInfo = (props) =>
                             >
                             <option value ="">Select your State</option>
                                 {
+                                    states != null &&
                                     states.map((state) =>
                                     <option value ={state.id}>{ state.name }</option>
                                 )}
@@ -164,10 +207,30 @@ const OfficeInfo = (props) =>
                    
                 </div>
                 <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-md-12">
+                    <div className="col-lg-6 col-sm-12 col-md-6">
+                        <fieldset>
+                                <select 
+                                    name="city_id"
+                                    style={{color:'#777777'}}    
+                                    ref={register({
+                                        required: "Required",
+                                    })}
+                                >
+                                <option value ="">Select your City</option>
+                                    {
+                                        cities != null &&
+                                        cities.map((city) =>
+                                        <option value ={city.id}>{ city.name }</option>
+                                    )}
+                            </select> 
+                            <small className="text-danger" hidden = {!isLoadingCities}>Loading Cities....</small>
+                            <small className="text-danger">{errors.city_id?.type == "required" && "City is required"}</small>
+                        </fieldset>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-md-6">
                     <fieldset>
                        <input 
-                            placeholder="House Address" 
+                            placeholder="Office Address" 
                             type="text" 
                             tabindex="1" 
                             autofocus
@@ -176,7 +239,7 @@ const OfficeInfo = (props) =>
                                 required: "Required"
                             })}
                         />
-                        <small className="text-danger">{errors.address?.type == "required" && "House Address is required"}</small>
+                        <small className="text-danger">{errors.address?.type == "required" && "Office Address is required"}</small>
                     </fieldset>
                     </div>
                 </div>

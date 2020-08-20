@@ -41,7 +41,7 @@ const Interest = (props) => {
             </fieldset>
             </div>
             <div className="col-lg-12 col-sm-12 col-md-12">
-            <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Interest Rate per Month</p>        
+            <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Interest Rate per Month</p>        
             <fieldset> 
             <input  
                     type="text" 

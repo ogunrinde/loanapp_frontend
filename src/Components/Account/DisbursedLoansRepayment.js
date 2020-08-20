@@ -28,6 +28,7 @@ const DisbursedFundRepayment = (props) => {
     const month = useSelector(state => state.root.month);
 
     const viewrepayment = async (request) => {
+        //alert(JSON.stringify(request));
         await dispatch(ViewRepaymentsOnRequestId(request.request.id));
         props.nextStep();
     }

@@ -2,7 +2,7 @@
 import React, { useState, useEffect} from 'react';
 import '../css/css/profile.css';
 import { useForm } from "react-hook-form";
-import { places, countrystates } from '../Components/redux/action/index';
+import { places, countrystates, Getcities } from '../Components/redux/action/index';
 import { useSelector, useDispatch } from 'react-redux'; 
 import { userbasicInfo, UserhomeAddress } from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
@@ -13,8 +13,10 @@ const HomeAddress = (props) =>
     const dispatch = useDispatch();
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
+    const [ isLoadingCities, setisLoadingCities ] = useState(false);
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
+    const cities = useSelector(state => state.root.cities);
     const nextphase = useSelector(state => state.root.nextphase);
     const IsFetching = useSelector(state => state.root.IsFetching);
     const { handleSubmit, register, errors } = useForm();
@@ -32,9 +34,15 @@ const HomeAddress = (props) =>
         setisLoadingState(false);
     }
 
+    const handleState = (event) => {
+        setisLoadingCities(true);
+        dispatch(Getcities(event.target.value));
+        setisLoadingCities(false);
+    }
+
     const onSubmit = async (data) =>
     { 
-        alert(JSON.stringify(data));
+        //alert(JSON.stringify(data));
         await dispatch(UserhomeAddress(data));
         props.nextStep();
     }
@@ -43,7 +51,7 @@ const HomeAddress = (props) =>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Home Address</h3>
                 <div className="row">
-                <div className="col-lg-6 col-sm-12 col-md-6">
+                <div className="col-lg-4 col-sm-12 col-md-6">
                     <fieldset>
                         <select 
                                 name="country_id"
@@ -55,6 +63,7 @@ const HomeAddress = (props) =>
                             >
                             <option value ="">Select your Country</option>
                                 {
+                                    countries != null &&
                                     countries.map((country) =>
                                     <option value ={country.id}>{ country.name }</option>
                                 )}
@@ -62,10 +71,11 @@ const HomeAddress = (props) =>
                         <small className="text-danger">{errors.country?.type == "required" && "Country is required"}</small>
                     </fieldset>
                 </div>
-                <div className="col-lg-6 col-sm-12 col-md-6">
+                <div className="col-lg-4 col-sm-12 col-md-6">
                     <fieldset>
                             <select 
                                 name="state_id"
+                                onChange = {(text) => handleState(text)}
                                 style={{color:'#777777'}}    
                                 ref={register({
                                     required: "Required",
@@ -73,11 +83,31 @@ const HomeAddress = (props) =>
                             >
                             <option value ="">Select your State</option>
                                 {
+                                    states != null &&
                                     states.map((state) =>
                                     <option value ={state.id}>{ state.name }</option>
                                 )}
                         </select> 
                         <small className="text-danger">{errors.state?.type == "required" && "State is required"}</small>
+                    </fieldset>
+                </div>
+                <div className="col-lg-4 col-sm-12 col-md-6">
+                    <fieldset>
+                            <select 
+                                name="city_id"
+                                style={{color:'#777777'}}    
+                                ref={register({
+                                    required: "Required",
+                                })}
+                            >
+                            <option value ="">Select your City</option>
+                                {
+                                    cities != null &&
+                                    cities.map((city) =>
+                                    <option value ={city.id}>{ city.name }</option>
+                                )}
+                        </select> 
+                        <small className="text-danger">{errors.city?.type == "required" && "City is required"}</small>
                     </fieldset>
                 </div>
                 </div>

@@ -7,14 +7,17 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  HashRouter,
   Redirect,
   useParams,
   Link
 } from "react-router-dom";
 import Profile from '../src/Components/Profile';
 import SureVault from './Components/sureVault';
-import Peer from './Components/peer';
+import PeerBorrower from './Components/peer_borrower';
+import PeerLender from './Components/peer_lender';
 import SureOffers from './Components/sureOffers';
+import SureConnect from './Components/sureconnect';
 import SureRequest from './Components/sureRequest';
 import ReviewRequests from './Components/ReviewRequest';
 import SureDeals from './Components/sureDeals';
@@ -28,6 +31,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { useSelector, useDispatch } from 'react-redux';
 import BorrowerMarket from './Components/borrowermarket';
 import LenderMarket from './Components/lendermarket';
+import VerifyEmail from './Components/verifyemail';
 
 
 function PrivateRoute({ children, ...rest }) {
@@ -61,6 +65,10 @@ const App = (props) => {
               <Header />
               <Welcome />
             </Route>
+            <Route path="/verifyemail/:id">
+              <Header />
+              <VerifyEmail />
+            </Route>
             <Route path="/login">
               <Login />
             </Route>
@@ -75,13 +83,21 @@ const App = (props) => {
               <Header />
               <SureVault />
             </PrivateRoute>
-            <PrivateRoute path="/peer">
+            <PrivateRoute path="/peer_lender">
               <Header />
-              <Peer />
+              <PeerLender />
+            </PrivateRoute>
+            <PrivateRoute path="/peer_borrower">
+              <Header />
+              <PeerBorrower />
             </PrivateRoute>
             <PrivateRoute path="/sureoffers">
               <Header />
               <SureOffers />
+            </PrivateRoute>
+            <PrivateRoute path = "/sureconnect">
+              <Header />
+              <SureConnect />
             </PrivateRoute>
             <PrivateRoute path="/reviewrequest">
               <Header />
@@ -95,14 +111,14 @@ const App = (props) => {
               <Header />
               <Home />
             </PrivateRoute>
-            <Route path = "/makerequest">
+            <PrivateRoute path = "/makerequest">
               <Header />
               <MakeRequest />
-            </Route>
-            <Route path = "/pendingapproval">
+            </PrivateRoute>
+            <PrivateRoute path = "/pendingapproval">
               <Header />
               <PendingLoanApproval />
-            </Route>
+            </PrivateRoute>
             <Route path = "/borrower_market">
               <Header />
               <BorrowerMarket />
@@ -110,6 +126,10 @@ const App = (props) => {
             <Route path = "/lender_market">
               <Header />
               <LenderMarket />
+            </Route>
+            <Route path="*">
+              <Header />
+              <Welcome />
             </Route>
           </Switch>
       </Router>

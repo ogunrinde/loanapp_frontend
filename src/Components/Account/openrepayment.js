@@ -57,7 +57,7 @@ const OpenRepaymentforLender = (props) =>
         <section className="lattest-product-area pb-40 category-list">
         <ReactNotification />
             <div hidden={!view_more} className="sideview">
-                <div>
+                <div style={{float:'right'}}>
                     <a className="pull-right">
                     <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                     </a>

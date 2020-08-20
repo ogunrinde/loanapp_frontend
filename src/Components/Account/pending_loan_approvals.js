@@ -16,7 +16,7 @@ import Sidebar from './sidebar';
 import {  GetpendingApprovals } from '../redux/action/loan';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import Request from './Request';
+import PendingLoanRequest from './PendingLoanRequest';
 import { requeststatus } from '../redux/action';
 
 const PendingLoanApprovals = (props) => 
@@ -28,6 +28,7 @@ const PendingLoanApprovals = (props) =>
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
     const month = useSelector(state => state.root.month);
+    const type = 'lender';
     
     useEffect(() => {
         process();
@@ -42,7 +43,6 @@ const PendingLoanApprovals = (props) =>
 
     const requestInformation = (request) => 
     {
-        //alert(JSON.stringify(request));
         setrequest(request);
         setview_more(true);
     }
@@ -59,14 +59,14 @@ const PendingLoanApprovals = (props) =>
         <section className="lattest-product-area pb-40 category-list">
             <ReactNotification />
                 <div hidden={!view_more} className ="sideview">
-                    <div>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
                         <div id="">
-                        { Object.keys(request).length > 0 && <Request request = {request} />   }
+                        { Object.keys(request).length > 0 && <PendingLoanRequest request = {request} type = {type} />   }
                         {/* <Tabs defaultIndex={1} onSelect={index => alert(index)}>
                             <TabList style ={{borderColor:'green'}}>
                             <Tab style={{backgroundColor:'#003679',color:'#fff',borderColor:'#003679', borderTopLeftRadius:7,borderTopRightRadius:7}}>Borrower Profile</Tab>
@@ -139,6 +139,9 @@ const PendingLoanApprovals = (props) =>
                             LenderpendingApprovals.length == 0 &&
                             <div style={{textAlign:'center', marginTop:20,width:'100%'}}>No Data Found</div>
                     }
+                </div>
+                <div style={{textAlign:'center'}}>
+
                 </div>
                 <div style={{textAlign:'center',marginTop:100}}>
                     <Loader

@@ -45,7 +45,7 @@ const LenderMarket = (props) =>
     }
 
     const ViewlenderProfile = (offer) => {
-        alert(IsLoggedIn);
+        //alert(IsLoggedIn);
         if(IsLoggedIn == false)
         {
             props.history.push('/login');
@@ -71,14 +71,14 @@ const LenderMarket = (props) =>
                     </div>
                 </div>
             </section>
-            <div hidden={!view_profile} className="sideview">
-                    <div>
+            <div hidden={!view_profile} className="sideview2">
+                    <div style={{float:'right',padding:10}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_profile(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
-                    <div className="">
-                        <div id="user">
+                    <div className="" style={{width:'100%'}}>
+                        <div id="">
                             {
                                Object.keys(vault).length > 0 && lenderId > 0 &&
                                <MarketPlacedetails lenderId ={lenderId} vault ={vault} />
@@ -89,49 +89,56 @@ const LenderMarket = (props) =>
             <section>
             <div className="profilecontainer"> 
               <div id="contact">
-              <ul className="list-group">
+              <div className="list-group">
                   {
                       all_lender_offers.length > 0 &&
                       all_lender_offers.map((offer) => 
-                 
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="single-latest-news-area d-flex align-items-center">
-                            <div className="news-thumbnail">
-                                <img src="img/bg-img/7.jpg" alt=""/>
-                            </div>
-                            <div className="news-content">
-                                <p href="#">{offer.user.name}</p>
-                                <p style={{fontSize:14,}}><span style={{fontSize:12}}>Available Fund</span>: NGN {offer.fundamount.toLocaleString()}</p>
-                                <div className="news-meta">
-                                    <a href="#" className="post-author">Min Interest Rate {offer.minInterestperMonth}%</a>
-                                    <a href="#" className="post-date">Max Interest Rate {offer.maxInterestperMonth}%</a> 
+                        <div class="list-group-item list-group-item-action disabled">
+                            <div className="row">
+                                <div className="col-lg-2 col-sm-2 col-md-2 col-4">
+                                   <div className="news-thumbnail">
+                                     <img src="img/bg-img/7.jpg" alt=""/>
+                                    </div>
+                                </div>    
+                                <div className="col-lg-7 col-sm-7 col-md-7 col-8 content">
+                                    <div className="news-content">
+                                        <p style={{textTransform:'capitalize'}}>{offer.user.name}</p>
+                                        <p style={{fontSize:14}}>NGN {offer.fundamount.toLocaleString()}</p>
+                                        <div className="news-meta">
+                                            <a className="post-author">Min Interest Rate {offer.minInterestperMonth}%</a>
+                                        </div>
+                                        <div className="news-meta">
+                                            <a className="post-date">  Max Interest Rate {offer.maxInterestperMonth}%</a> 
+                                        </div>
+                                    
+                                    </div>
                                 </div>
-                               
+                                <div className="col-lg-3 col-sm-12 col-md-3">
+                                       <div style ={{textAlign:'right'}}>
+                                       <button  name="submit" style={{padding:4}} className="viewdetail" onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
+
+                                       </div>
+
+                                </div>   
                             </div>
                         </div>
-                    <div className="row">
-                        
-                        <div className="col-lg-12">
-                          <button name="submit" style={{padding:4}} onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
-                        </div>
-                    </div>
-                    
-                   
-                    </li>
+                     
                     )
-                }
+                   }
                     <div hidden = {all_lender_offers.length == 0 && IsFetching == false ? false: true}>
                     <li className="list-group-item d-flex justify-content-between align-items-center" >
                         <div className="single-latest-news-area d-flex align-items-center">
                                 
                                 <div className="news-content">
-                                    <p href="#">No Offers Found</p>
+                                    <p href="#">No Offer Found</p>
                                     
                                 </div>
                         </div>
                     </li>
                     </div>
-                    <Loader
+                </div>    
+                <div style={{width:'100%',textAlign:'center'}}>
+                <Loader
                         visible={IsFetching}
                         type="Puff"
                         color="#ffbb38"
@@ -140,8 +147,8 @@ const LenderMarket = (props) =>
                         timeout= {0} //3 secs
                 
                     />
-                  
-                </ul>
+                </div>
+             
               </div>
             </div>    
                

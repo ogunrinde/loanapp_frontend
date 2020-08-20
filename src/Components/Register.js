@@ -26,7 +26,7 @@ const Register = (props) =>
 	const [ isSubmitting, setisSubmitting] = useState(false);
     const { register, handleSubmit, watch, errors } = useForm();
     const onSubmit = async (data,e) => {
-		await dispatch(user_attempt_register(data));
+		await dispatch(user_attempt_register(data,props));
 		e.target.reset();
 	}
 	useEffect(()=>{
@@ -42,11 +42,16 @@ const Register = (props) =>
 		    <div className="container-login100">
 			<div className="wrap-login100">
 				<form onSubmit={handleSubmit(onSubmit)} className="login100-form validate-form">
-					<span className="login100-form-title p-b-43">
-						Create Account {IsAccountCreated.toString()}
+			    <div style={{textAlign:'center'}}>
+					<div className="logo">
+						<Link to ="/"><img src="../../img/core-img/logo.png" alt=""/></Link>
+					</div>
+				</div>		
+					<span className="login100-form-title p-b-43" style={{marginTop:30}}>
+						Create Account
 					</span>
 
-					<label>Name</label>
+					<label style={{fontSize:14}}>Name</label>
                     <div className="wrap-input100 validate-input">
                         <input 
                             className="input100" 
@@ -104,12 +109,6 @@ const Register = (props) =>
 							{/* <label className="label-checkbox100" for="ckb1">
 								Remember me
 							</label> */}
-						</div>
-
-						<div>
-							<a href="#" className="txt1">
-								Forgot Password?
-							</a>
 						</div>
 					</div>
 			

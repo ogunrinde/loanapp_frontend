@@ -7,6 +7,12 @@ import { Createvault_availablefund } from '../Components/redux/action/createvaul
 const Availablefund = (props) => {
     const { handleSubmit, register, errors } = useForm();
     const dispatch = useDispatch();
+
+    const userdetails = useSelector(state => state.root.userbasicdetails);
+    const userhomeaddress = useSelector(state => state.root.userHomeAddress);
+    const userofficeaddress = useSelector(state => state.root.userOfficeAddress);
+    const usersocialmedia = useSelector(state => state.root.userSocialMediaAccounts);
+    const bankdetail = useSelector(state => state.root.userBankInformation);
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
     const countries = useSelector(state => state.places.countries);
@@ -31,14 +37,17 @@ const Availablefund = (props) => {
                        <input
                         type="number" 
                         name="fundamount"
-                        min="0"
+                        min="1"
                         tabindex="1" 
                         autofocus
                         ref={register({
-                            required: "Required"
+                            required: "Required",
+                            min:1,
+                            max:999999999999
                           })}
                         />
                         <small className="text-danger">{errors.fundamount?.type == "required" && "Fund Amount is required"}</small>
+                        <small className="text-danger">{(errors.fundamount?.type == "min" && errors.fundamount?.type == "max") && "Invalid Input"}</small>
                     </fieldset>
                     </div>
                 
@@ -62,7 +71,7 @@ const Availablefund = (props) => {
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-3">
                     <fieldset>
-                       <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Fund Available From </p>  
+                       <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Fund Available To </p>  
                        <input 
                             type="date" 
                             tabindex="1" 
@@ -86,7 +95,14 @@ const Availablefund = (props) => {
                     <div className="col-lg-3">
                     </div>
                     <div className="col-lg-3">
-                    <button name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
+                    {
+                        (userdetails != null &&
+                            userhomeaddress != null &&
+                            userofficeaddress != null &&
+                            usersocialmedia != null &&
+                            bankdetail != null) &&  <button name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
+
+                    }   
                     </div>
                 </div>    
                 

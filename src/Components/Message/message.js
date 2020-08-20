@@ -22,9 +22,16 @@ export function Success(title,msg)
 export function Error(title,error)
 {
     let message = '';
-    Object.keys(error).forEach(function(key){
-        message += error[key] + '\n';
-    });
+    if(typeof error === 'object')
+    {
+      Object.keys(error).forEach(function(key){
+          message += error[key] + '\n';
+      });
+    }
+    else {
+          message = error;
+    }
+    
     return store.addNotification({
         title: title,
         message: message,

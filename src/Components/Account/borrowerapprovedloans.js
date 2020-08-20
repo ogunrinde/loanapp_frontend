@@ -26,6 +26,8 @@ const BorrowerApprovedRequest = (props) =>
     const [IsFetching, setIsFetching] = useState(false);
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
+    const month = useSelector(state => state.root.month);
+    const type = 'borrower';
     
     useEffect(() => {
         process();
@@ -43,18 +45,29 @@ const BorrowerApprovedRequest = (props) =>
         setrequest(request);
         setview_more(true);
     }
+
+    const FormatDate = (date) => {
+        date = date.split('T')[0];
+        let d = date.split('-');
+        let day = d[2];
+        let mth = month[parseInt(d[1])-1];
+        let year = d[0];
+        return `${day} ${mth}, ${year}`;
+    }
+
+
     return(
         <section className="lattest-product-area pb-40 category-list">
             <ReactNotification />
                 <div hidden={!view_more} className="sideview">
-                    <div>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
                         <div id="">
-                        { Object.keys(request).length > 0 && <Request request = {request} />   }
+                        { Object.keys(request).length > 0 && <Request request = {request} type = {type} />   }
                         
                         </div>
                     </div>
@@ -76,27 +89,27 @@ const BorrowerApprovedRequest = (props) =>
                             approvedloans.map((request,id) =>
                             <tr>
                                 <td>
-                                    <p>{id+1}</p>
+                                    {id+1}
                                 </td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            <p>{request.lender.name}</p>
+                                            {request.lender.name}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <p>{request.request.repaymentplan}</p>
+                                    {request.request.repaymentplan}
                                 </td>
                                 <td>
-                                    <p>{request.request.loanperiod}</p>
+                                    {request.request.loanperiod}
                                 </td>
                                 <td>
-                                    <p>{request.request.created_at}</p>
+                                    {FormatDate(request.request.created_at)}
                                 </td>
                                 <td>
-                                    <button onClick = {() => requestInformation(request)} style={{padding:7,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:7}}>View Profile</button>
+                                    <button onClick = {() => requestInformation(request)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>View Profile</button>
                                 
                                 </td>
                             </tr>

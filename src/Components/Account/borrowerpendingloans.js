@@ -16,7 +16,8 @@ import Sidebar from './sidebar';
 import {  GetBorrowerpendingapprovals } from '../redux/action/index';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import Request from './Request';
+//import Request from './Request';
+import LenderRequest from './LenderRequest';
 
 const BorrowerPendingRequest = (props) => 
 {
@@ -26,6 +27,7 @@ const BorrowerPendingRequest = (props) =>
     const [IsFetching, setIsFetching] = useState(false);
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
+    const type = 'borrower';
     
     useEffect(() => {
         process();
@@ -43,18 +45,24 @@ const BorrowerPendingRequest = (props) =>
         setrequest(request);
         setview_more(true);
     }
+
+    const FormatDate = (date) => {
+		let d = new Date(date).toString();
+		d = d.split('G')[0];
+		return d;
+    }
     return(
         <section className="lattest-product-area pb-40 category-list">
             <ReactNotification />
                 <div hidden={!view_more} className="sideview">
-                    <div>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
                         <div id="">
-                        { Object.keys(request).length > 0 && <Request request = {request} />   }
+                        { Object.keys(request).length > 0 && <LenderRequest request = {request} type = {type} />   }
                         
                         </div>
                     </div>
@@ -66,7 +74,7 @@ const BorrowerPendingRequest = (props) =>
                                 <th scope="col">S/N</th>
                                 <th scope="col">Lender Name</th>
                                 <th scope="col">Repayment Plan</th>
-                                <th scope="col">Loan Period</th>
+                                <th scope="col">Loan Period (In months)</th>
                                 <th scope="col">Request Date</th>
 								<th scope="col">Option</th>
                             </tr>
@@ -76,27 +84,27 @@ const BorrowerPendingRequest = (props) =>
                             mypendingapprovalloans.map((request,id) =>
                             <tr>
                                 <td>
-                                    <p>{id+1}</p>
+                                    {id+1}
                                 </td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            <p>{request.lender.name}</p>
+                                            {request.lender.name}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <p>{request.request.repaymentplan}</p>
+                                    {request.request.repaymentplan}
                                 </td>
                                 <td>
-                                    <p>{request.request.loanperiod}</p>
+                                    {request.request.loanperiod}
                                 </td>
                                 <td>
-                                    <p>{request.request.created_at}</p>
+                                    {FormatDate(request.request.created_at)}
                                 </td>
                                 <td>
-                                    <button onClick = {() => requestInformation(request)} style={{padding:7,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:7}}>View Profile</button>
+                                    <button onClick = {() => requestInformation(request)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>View Profile</button>
                                 
                                 </td>
                             </tr>

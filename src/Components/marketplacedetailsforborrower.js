@@ -51,7 +51,8 @@ const MarketPlacedetailsForBorrower = (props) => {
 	}
 	const getUserInformation = async () => {
         if(props.borrowerId == undefined || props.borrowerId == 0) return false;
-        setIsFetchingUserInformation(true);
+		setIsFetchingUserInformation(true);
+		//alert(props.borrowerId);
         await dispatch(GetProfile(props.borrowerId));
         setIsFetchingUserInformation(false);
 		
@@ -71,7 +72,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 
     const connectBorrower = async () => {
         setIsConnecting(true);
-        let data = {borrower_request_id : props.request.id, borrower_id:props.request.user.id};
+		let data = {borrower_request_id : props.request.id, borrower_id:props.request.user.id};
         await dispatch(ConnectwithBorrower(data));
         setIsConnecting(false);
     }
@@ -99,13 +100,11 @@ const MarketPlacedetailsForBorrower = (props) => {
 					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
 				</div>
 				<div className="user-data">
-                    <h2>{userdetails.surname}</h2>
-					<span className="post-label">Admin</span>
-					<span className="post-label">Speaker</span>
-					<span className="post-label">AMA</span>
-					<p>Founder and CEO at okay cdhhfin this is dhgppod  
-					
-					</p>
+                    <h2 style={{marginBottom:7}}>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
+		{/* <span className="post-label">{userofficestate}</span>
+		<span className="post-label">{userprofile.}</span>
+					<span className="post-label">AMA</span>  */}
+				<p style={{marginBottom:7}}>{userprofile.homeaddress.address}</p>
                     <p>
                     <Loader
                             visible={IsConnecting}
@@ -134,7 +133,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Surname</p>
 						</div>
 						<div className="desc">
-							{userdetails.surname}
+							{userprofile.userdetails.surname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -142,7 +141,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Firstname</p>
 						</div>
 						<div className="desc">
-							{userdetails.firstname}
+							{userprofile.userdetails.firstname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -150,7 +149,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Middlename</p>
 						</div>
 						<div className="desc">
-							{userdetails.middlename}
+							{userprofile.userdetails.middlename}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -158,7 +157,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Email</p>
 						</div>
 						<div className="desc">
-							{userdetails.email}
+							{userprofile.userdetails.email}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -166,7 +165,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Gender</p>
 						</div>
 						<div className="desc">
-							{userdetails.gender}
+							{userprofile.userdetails.gender}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -174,7 +173,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Mobile Number 1</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile1}
+							{userprofile.userdetails.mobile1}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -182,7 +181,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Mobile Number 2</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile2}
+							{userprofile.userdetails.mobile2}
 						</div>
 					</div>
 					
@@ -195,7 +194,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Employment Status</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.employmentstatus}
+							{userprofile.officeaddress.employmentstatus}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -203,7 +202,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Company Name</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.company_name}
+							{userprofile.officeaddress.company_name}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -211,7 +210,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Contact Number</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_number}
+							{userprofile.officeaddress.contact_number}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -219,7 +218,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Office Contact Website</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_website}
+							{userprofile.officeaddress.contact_website}
 						</div>
 					</div>
 					
@@ -231,7 +230,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>BVN</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bvn}
+							{userprofile.bankdetails.bvn}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -239,7 +238,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Bank Name</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bankname}
+							{userprofile.bankdetails.bankname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -247,7 +246,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Account Number</p>
 						</div>
 						<div className="desc">
-							{bankdetail.accountnumber}
+							{userprofile.bankdetails.accountnumber}
 						</div>
 					</div>
                

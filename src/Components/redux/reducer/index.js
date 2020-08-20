@@ -35,7 +35,19 @@ import {
     VIEWREPAYMENTONREQUESTID,
     ALL_LENDER_OFFERS,
     ALL_BORROWER_REQUESTS,
-    CONNECTWITHBORROWER
+    CONNECTWITHBORROWER,
+    LENDER_OVERDUES,
+    BORROWER_OVERDUES,
+    LOANSRECEIVED,
+    BORROWER_PAYMENT_SCHEDULES,
+    LENDER_PAYMENT_SCHEDULES,
+    VERIFY_EMAIL,
+    VERIFY_PHONE,
+    CODES,
+    CITIES,
+    VAULT_CREATED,
+    SURECONNECT,
+    PAYMENTANALYTICS
 } from '../action/constants';
 
 const initialState = {
@@ -72,6 +84,18 @@ const initialState = {
     repaymentsonrequestId:'',
     all_lender_offers:[],
     all_borrowers_requests:[],
+    borrower_overdues:[],
+    lender_overdues:[],
+    loansreceived:[],
+    borrower_payment_schedules:[],
+    lender_payment_schedules:[],
+    verify_email:'',
+    verify_phone:false,
+    codes:[],
+    cities:[],
+    vaultcreated: false,
+    sureconnect:{},
+    paymentanalytics:{},
     month: ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 };
@@ -102,6 +126,12 @@ export function RootReducer(state = initialState, action)
     {
         return Object.assign({}, state, {
             countries: action.payload.data
+        });
+    }
+    else if(action.type == CITIES)
+    {
+        return Object.assign({}, state, {
+            cities: action.payload.cities
         });
     }
     else if(action.type == USERBASICDETAILS)
@@ -142,7 +172,7 @@ export function RootReducer(state = initialState, action)
     else if(action.type == MAKEREQUEST)
     {
         return Object.assign({}, state, {
-            sureOffers: action.payload.matchingoffers,
+            sureOffers: action.payload.offers,
             loanrequest: action.payload.loanrequest
         });
     }
@@ -287,6 +317,24 @@ export function RootReducer(state = initialState, action)
             analytics:{},
             myvault:[],
             transactions:[],
+            allmyloansrequest:[],
+            repayments_lender:[],
+            repayments_borrower:[],
+            repaymentsonrequestId:'',
+            all_lender_offers:[],
+            all_borrowers_requests:[],
+            borrower_overdues:[],
+            lender_overdues:[],
+            loansreceived:[],
+            borrower_payment_schedules:[],
+            lender_payment_schedules:[],
+            verify_email:'',
+            verify_phone:false,
+            codes:[],
+            cities:[],
+            vaultcreated: false,
+            sureconnect:{},
+            paymentanalytics:{},
         });
     }
     else if(action.type == ALL_LENDER_OFFERS)
@@ -306,6 +354,83 @@ export function RootReducer(state = initialState, action)
         return Object.assign({}, state, {
             //: action.payload.requests
         });
+    }
+    else if(action.type == BORROWER_OVERDUES)
+    {
+        return Object.assign({}, state, {
+            borrower_overdues: action.payload.borrower_overdues
+        });
+    }
+    else if(action.type == LENDER_OVERDUES)
+    {
+        return Object.assign({}, state, {
+            lender_overdues: action.payload.lender_overdues
+        });
+    }
+    else if(action.type == LOANSRECEIVED)
+    {
+        return Object.assign({}, state, {
+            loansreceived: action.payload.request
+        });
+    }
+    else if(action.type == BORROWER_PAYMENT_SCHEDULES)
+    {
+        //alert(JSON.stringify(action.payload.schedules));
+        return Object.assign({}, state, {
+            borrower_payment_schedules: action.payload.schedules
+        });
+    }
+    else if(action.type == LENDER_PAYMENT_SCHEDULES)
+    {
+        return Object.assign({}, state, {
+            lender_payment_schedules: action.payload.schedules
+        });
+    }
+    else if(action.type == VERIFY_PHONE)
+    {
+        return Object.assign({}, state, {
+            verify_phone: action.payload.verify_phone
+        });
+    }
+    else if(action.type == CODES)
+    {
+        return Object.assign({}, state, {
+            codes: action.payload
+        });
+    }
+    else if(action.type == VAULT_CREATED)
+    {
+        return Object.assign({}, state, {
+            vaultcreated: !state.vaultcreated
+        });
+    }
+    else if(action.type == SURECONNECT)
+    {
+        return Object.assign({}, state, {
+            sureconnect: action.payload.request
+        });
+    }
+    else if(action.type == PAYMENTANALYTICS)
+    {
+        return Object.assign({}, state, {
+            paymentanalytics: action.payload
+        });
+    }
+    else if(action.type == VERIFY_EMAIL)
+    {
+        if(action.payload.status == 'success')
+        {
+            return Object.assign({}, state, {
+                verify_email: 'Email is Verified'
+            });
+        }
+        else if(action.payload.status == 'failed')
+        {
+            return Object.assign({}, state, {
+                verify_email: 'Email Verification Failed'
+            });
+        }
+        
     }
     return state;
 

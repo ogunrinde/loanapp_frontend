@@ -20,13 +20,14 @@ const ViewProfile = (props) => {
     const bankdetail = useSelector(state => state.root.userBankInformation);
     const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
     const [ IsGettingVault, setIsGettingVault ] = useState(false);
-    const lenderVault = useSelector(state => state.root.lendervault);
+    //const lenderVault = useSelector(state => state.root.lendervault);
 	const { handleSubmit, register, errors } = useForm();
 	const dispatch = useDispatch();
 	const userprofile = useSelector(state => state.root.viewuserprofile);
     const [IsSubmitting, setIsSubmitting] = useState(false);
     const [IsConnecting, setIsConnecting] = useState(false);
-    const request = props.request;
+	const request = props.request;
+	const lenderVault = props.vaultdetail;
     const month = useSelector(state => state.root.month);
 
 	// const onSubmit = data => {
@@ -34,6 +35,7 @@ const ViewProfile = (props) => {
 	// }
     useEffect(() =>{
 		getUserInformation();
+		//alert(JSON.stringify(lenderVault));
     },[props.lenderId]);
     if(Object.keys(userprofile).length > 0)
     {
@@ -50,7 +52,8 @@ const ViewProfile = (props) => {
 	const getUserInformation = async () => {
         if(props.lenderId == undefined || props.lenderId == 0) return false;
         setIsFetchingUserInformation(true);
-        await dispatch(GetProfile(props.lenderId));
+		await dispatch(GetProfile(props.lenderId));
+		//alert(JSON.stringify(userprofile));
         setIsFetchingUserInformation(false);
 		
 	}
@@ -68,7 +71,7 @@ const ViewProfile = (props) => {
     }
 
     const connectLender = async () => {
-        setIsConnecting(true);
+		setIsConnecting(true);
         await dispatch(ConnectwithLender(props.lenderId,props.vaultId,props.requestId));
         setIsConnecting(false);
     }
@@ -96,13 +99,11 @@ const ViewProfile = (props) => {
 					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
 				</div>
 				<div className="user-data">
-                    <h2>{userdetails.surname}</h2>
-					<span className="post-label">Admin</span>
-					<span className="post-label">Speaker</span>
-					<span className="post-label">AMA</span>
-					<p>Founder and CEO at okay cdhhfin this is dhgppod  
-					
-					</p>
+				<h2 style={{marginBottom:7}}>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
+		{/* <span className="post-label">{userofficestate}</span>
+		<span className="post-label">{userprofile.}</span>
+					<span className="post-label">AMA</span>  */}
+				<p style={{marginBottom:7}}>{userprofile.homeaddress.address}</p>
                     <p>
                     <Loader
                             visible={IsConnecting}
@@ -131,7 +132,7 @@ const ViewProfile = (props) => {
 							<p>Surname</p>
 						</div>
 						<div className="desc">
-							{userdetails.surname}
+							{userprofile.userdetails.surname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -139,7 +140,7 @@ const ViewProfile = (props) => {
 							<p>Firstname</p>
 						</div>
 						<div className="desc">
-							{userdetails.firstname}
+							{userprofile.userdetails.firstname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -147,7 +148,7 @@ const ViewProfile = (props) => {
 							<p>Middlename</p>
 						</div>
 						<div className="desc">
-							{userdetails.middlename}
+							{userprofile.userdetails.middlename}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -155,7 +156,7 @@ const ViewProfile = (props) => {
 							<p>Email</p>
 						</div>
 						<div className="desc">
-							{userdetails.email}
+							{userprofile.userdetails.email}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -163,7 +164,7 @@ const ViewProfile = (props) => {
 							<p>Gender</p>
 						</div>
 						<div className="desc">
-							{userdetails.gender}
+							{userprofile.userdetails.gender}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -171,7 +172,7 @@ const ViewProfile = (props) => {
 							<p>Mobile Number 1</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile1}
+							{userprofile.userdetails.mobile1}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -179,7 +180,7 @@ const ViewProfile = (props) => {
 							<p>Mobile Number 2</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile2}
+							{userprofile.userdetails.mobile2}
 						</div>
 					</div>
 					
@@ -192,7 +193,7 @@ const ViewProfile = (props) => {
 							<p>Employment Status</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.employmentstatus}
+							{userprofile.officeaddress.employmentstatus}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -200,7 +201,7 @@ const ViewProfile = (props) => {
 							<p>Company Name</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.company_name}
+							{userprofile.officeaddress.company_name}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -208,7 +209,7 @@ const ViewProfile = (props) => {
 							<p>Contact Number</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_number}
+							{userprofile.officeaddress.contact_number}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -216,7 +217,7 @@ const ViewProfile = (props) => {
 							<p>Office Contact Website</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_website}
+							{userprofile.officeaddress.contact_website}
 						</div>
 					</div>
 					
@@ -228,7 +229,7 @@ const ViewProfile = (props) => {
 							<p>BVN</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bvn}
+							{userprofile.bankdetails.bvn}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -236,7 +237,7 @@ const ViewProfile = (props) => {
 							<p>Bank Name</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bankname}
+							{userprofile.bankdetails.bankname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -244,7 +245,7 @@ const ViewProfile = (props) => {
 							<p>Account Number</p>
 						</div>
 						<div className="desc">
-							{bankdetail.accountnumber}
+							{userprofile.bankdetails.accountnumber}
 						</div>
 					</div>
                
@@ -280,7 +281,7 @@ const ViewProfile = (props) => {
 							<p>Maximum Interest Per Month</p>
 						</div>
 						<div className="desc">
-                           {lenderVault.minInterestperMonth}%
+                           {lenderVault.maxInterestperMonth}%
 						</div>
 					</div>
                     <div className="bio-box">

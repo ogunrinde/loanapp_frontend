@@ -35,7 +35,8 @@ const MarketPlaceDetails = (props) => {
 	// }
     useEffect(() =>{
         getUserInformation();
-        dispatch(GetUserLoanRequest());
+		dispatch(GetUserLoanRequest());
+		//alert(JSON.stringify(LoanRequestData));
     },[props.lenderId]);
     if(Object.keys(userprofile).length > 0)
     {
@@ -70,9 +71,9 @@ const MarketPlaceDetails = (props) => {
     }
 
     const connectLender = async () => {
-        if(Object.keys(LoanRequestData).length == 0)
+        if(LoanRequestData == null || Object.keys(LoanRequestData).length == 0)
         {
-
+			alert('You do not have active loan request');
             return false;
         }
         setIsConnecting(true);
@@ -103,13 +104,11 @@ const MarketPlaceDetails = (props) => {
 					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
 				</div>
 				<div className="user-data">
-                    <h2>{userdetails.surname}</h2>
-					<span className="post-label">Admin</span>
-					<span className="post-label">Speaker</span>
-					<span className="post-label">AMA</span>
-					<p>Founder and CEO at okay cdhhfin this is dhgppod  
-					
-					</p>
+				<h2 style={{marginBottom:7}}>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
+		{/* <span className="post-label">{userofficestate}</span>
+		<span className="post-label">{userprofile.}</span>
+					<span className="post-label">AMA</span>  */}
+				<p style={{marginBottom:7}}>{userprofile.homeaddress.address}</p>
                     <p>
                     <Loader
                             visible={IsConnecting}
@@ -119,8 +118,21 @@ const MarketPlaceDetails = (props) => {
                             width={30}
                             timeout= {0} //3 secs
                     
-                        />    
-                    <button hidden={IsConnecting} onClick = {connectLender} style={{padding:5,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Connect with Lender Now</button>
+                        />  
+					{
+                        (userdetails != null &&
+                            userhomeaddress != null &&
+                            userofficeaddress != null &&
+                            usersocialmedia != null &&
+                            bankdetail != null) && <button hidden={IsConnecting} onClick = {connectLender} style={{padding:5,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Connect with Lender Now</button>
+                    }
+					{
+                        (userdetails == null ||
+                            userhomeaddress == null ||
+                            userofficeaddress == null ||
+                            usersocialmedia == null ||
+                            bankdetail != null) || <button  style={{padding:5,color:'#fff',borderColor:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Log to Connect</button>
+                    } 	  
 					</p>
 				</div>
 				
@@ -138,7 +150,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Surname</p>
 						</div>
 						<div className="desc">
-							{userdetails.surname}
+							{userprofile.userdetails.surname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -146,7 +158,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Firstname</p>
 						</div>
 						<div className="desc">
-							{userdetails.firstname}
+							{userprofile.userdetails.firstname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -154,7 +166,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Middlename</p>
 						</div>
 						<div className="desc">
-							{userdetails.middlename}
+							{userprofile.userdetails.middlename}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -162,7 +174,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Email</p>
 						</div>
 						<div className="desc">
-							{userdetails.email}
+							{userprofile.userdetails.email}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -170,7 +182,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Gender</p>
 						</div>
 						<div className="desc">
-							{userdetails.gender}
+							{userprofile.userdetails.gender}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -178,7 +190,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Mobile Number 1</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile1}
+							{userprofile.userdetails.mobile1}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -186,7 +198,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Mobile Number 2</p>
 						</div>
 						<div className="desc">
-							{userdetails.mobile2}
+							{userprofile.userdetails.mobile2}
 						</div>
 					</div>
 					
@@ -199,7 +211,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Employment Status</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.employmentstatus}
+							{userprofile.officeaddress.employmentstatus}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -207,7 +219,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Company Name</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.company_name}
+							{userprofile.officeaddress.company_name}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -215,7 +227,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Contact Number</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_number}
+							{userprofile.officeaddress.contact_number}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -223,7 +235,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Office Contact Website</p>
 						</div>
 						<div className="desc">
-							{userofficeaddress.contact_website}
+							{userprofile.officeaddress.contact_website}
 						</div>
 					</div>
 					
@@ -235,7 +247,7 @@ const MarketPlaceDetails = (props) => {
 							<p>BVN</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bvn}
+							{userprofile.bankdetails.bvn}
 						</div>
 					</div>
                     <div className="bio-box">
@@ -243,7 +255,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Bank Name</p>
 						</div>
 						<div className="desc">
-							{bankdetail.bankname}
+							{userprofile.bankdetails.bankname}
 						</div>
 					</div>
 					<div className="bio-box">
@@ -251,7 +263,7 @@ const MarketPlaceDetails = (props) => {
 							<p>Account Number</p>
 						</div>
 						<div className="desc">
-							{bankdetail.accountnumber}
+							{userprofile.bankdetails.accountnumber}
 						</div>
 					</div>
                

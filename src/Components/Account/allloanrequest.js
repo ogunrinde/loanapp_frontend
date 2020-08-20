@@ -78,13 +78,13 @@ const AllLoanRequest = (props) =>
                             allloansrequest.map((request,id) =>
                             <tr>
                                 <td>
-                                    <p>{id+1}</p>
+                                    {id+1}
                                 </td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            {request.requestAmount}
+                                            {request.requestAmount.toString().toLocaleString()}
                                         </div>
                                     </div>
                                 </td>
@@ -92,10 +92,10 @@ const AllLoanRequest = (props) =>
                                     {request.loanperiod}
                                 </td>
                                 <td>
-                                    {request.maxInterestRate}
+                                    {request.maxInterestRate}%
                                 </td>
                                 <td>
-                                    {request.minInterestRate}
+                                    {request.minInterestRate}%
                                 </td>
                                
                                 <td>

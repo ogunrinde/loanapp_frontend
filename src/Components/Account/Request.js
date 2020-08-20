@@ -19,6 +19,7 @@ const Request = (props) => {
 	const userprofile = useSelector(state => state.root.viewuserprofile);
 	const [IsSubmitting, setIsSubmitting] = useState(false);
 	const request = props.request;
+	const type = props.type;
 
 	const onSubmit = async data => {
 		//alert(JSON.stringify(data));
@@ -28,6 +29,7 @@ const Request = (props) => {
 	}
     useEffect(() =>{
 		getUserInformation();
+		//alert(JSON.stringify(request));
     },[]);
     if(Object.keys(userprofile).length > 0)
     {
@@ -42,7 +44,11 @@ const Request = (props) => {
 		});
 	}
 	const getUserInformation = async () => {
-        setIsFetchingUserInformation(true);
+		//alert(type);
+		setIsFetchingUserInformation(true);
+		if(type == 'borrower')
+		await dispatch(GetProfile(props.request.lender_id));
+		if(type == 'lender')
 		await dispatch(GetProfile(props.request.borrower_id));
 		//alert(JSON.stringify(request));
 		setIsFetchingUserInformation(false);
@@ -67,42 +73,47 @@ const Request = (props) => {
 				</div>
 				<div className="user-data">
 					<h2>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
-					<span className="post-label">Admin</span>
+					<p style={{marginBottom:7}}>{userprofile.homeaddress.address}</p>
+					{/* <span className="post-label">Admin</span>
 					<span className="post-label">Speaker</span>
 					<span className="post-label">AMA</span>
 					<p>Founder and CEO at <strong>NewSpot</strong><br/>
 					<i className="fa fa-map-marker" aria-hidden="true"></i>  Boston, MA, United States
-					</p>
-					<p>
-					<button hidden={IsSubmitting} onClick = {() => updatestatus('approved', request.connect.id)} style={{padding:5,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Approved Request</button>
-					<button hidden={IsSubmitting} onClick = {() => updatestatus('decline', request.connect.id)} style={{padding:5,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Decline</button>
-					<Loader
-						visible={IsSubmitting}
-						type="Puff"
-						color="#ffbb38"
-						height={30}
-						width={30}
-						timeout= {0} //3 secs
-				
-					/>
-					</p>
+					</p> */}
+					{/* {
+						type == 'lender' && 
+						<p>
+							<button hidden={IsSubmitting} onClick = {() => updatestatus('approved', request.id)} style={{padding:5,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Approved Request</button>
+							<button hidden={IsSubmitting} onClick = {() => updatestatus('decline', request.id)} style={{padding:5,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Decline</button>
+							<Loader
+								visible={IsSubmitting}
+								type="Puff"
+								color="#ffbb38"
+								height={30}
+								width={30}
+								timeout= {0} //3 secs
+						
+							/>
+					    </p>
+					} */}
+					
 
 				</div>
-				<div className="social-icons">
+				{/* <div className="social-icons">
 					<i className="fa fa-facebook"></i>
 					<i className="fa fa-twitter"></i>
 					<i className="fa fa-linkedin"></i>
 					<i className="fa fa-google"></i>
 					<i className="fa fa-instagram"></i>
-				</div>
+				</div> */}
 			</div>
 			<div className="tab-panel-main">
 				<ul className="tabs">
 					<li className="tab-link current" data-tab="officeaddress">Office Address</li>
 					<li className="tab-link" data-tab="Edu-detail">Bank Details</li>
 					<li className="tab-link" data-tab="request">Request</li>
-					<li className="tab-link" data-tab="todisburse">To Be Disbursed</li>
-					<li className="tab-link" data-tab="disbursed">Disbursed</li>
+					<li hidden = {type == 'borrower' ? true : false} className="tab-link" data-tab="todisburse">Disburse Loan</li>
+					<li hidden = {type == 'borrower' ? true : false} className="tab-link" data-tab="disbursed">Disbursed</li>
 				</ul>
 				<div id="officeaddress" className="tab-content current">
 			     	<div className="bio-box">
@@ -249,6 +260,7 @@ const Request = (props) => {
 								style={{fontSize:14, borderColor:'#f1f7f9'}}
 								type="number"
 								name="Amount_disbursed"
+								value={request.request.requestAmount}
 								class="form-control" 
 								id="exampleInputEmail1" 
 								aria-describedby="emailHelp" 
@@ -308,7 +320,19 @@ const Request = (props) => {
 						<input 
 							type="number" 
 							style={{fontSize:14, display:'none'}}
-							value = {request.connect.id}
+							value = {request.id}
+							name="dealId"
+							class="form-control" 
+							id="exampleInputPassword1" 
+							placeholder=""
+							ref={register({
+								required: "Required"
+							})}
+						/>
+						<input 
+							type="number" 
+							style={{fontSize:14, display:'none'}}
+							value = {request.lender_borrower_connection_id}
 							name="connectionId"
 							class="form-control" 
 							id="exampleInputPassword1" 
@@ -332,6 +356,7 @@ const Request = (props) => {
 					</div>
 					</div>
 				</div>
+				
 				<div id="disbursed" className="tab-content current">
 					<div className="skill-box">
 					  <ul>

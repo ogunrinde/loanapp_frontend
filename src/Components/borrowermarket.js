@@ -70,14 +70,14 @@ const BorrowerMarket = (props) =>
                     </div>
                 </div>
             </section>
-            <div hidden={!view_profile} style={{position:'fixed',right:0,top:0,width:'60%',height:'100%',overflowY:'scroll',zIndex:4000343005,backgroundColor:'#fff',padding:10}}>
+            <div hidden={!view_profile} className="sideview2">
                     <div>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_profile(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
-                    <div className="">
-                        <div id="user">
+                    <div className="" style={{width:'100%'}}>
+                        <div id="">
                             {
                                Object.keys(request).length > 0 && borrowerId > 0 &&
                                <MarketPlacedetailsForBorrower borrowerId ={borrowerId} request ={request} />
@@ -88,38 +88,44 @@ const BorrowerMarket = (props) =>
             <section>
             <div className="profilecontainer"> 
               <div id="contact">
-              <ul className="list-group">
+              <div className="list-group">
                   {
+                      all_borrowers_request != null &&
                       all_borrowers_request.length > 0 &&
                       all_borrowers_request.map((request) => 
-                 
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="single-latest-news-area d-flex align-items-center">
-                            <div className="news-thumbnail">
-                                <img src="img/bg-img/7.jpg" alt=""/>
-                            </div>
-                            <div className="news-content">
-                                <p href="#">{request.user.name}</p>
-                                <p style={{fontSize:14,}}><span style={{fontSize:12}}>Request Amount</span>: NGN {request.requestAmount.toLocaleString()}</p>
-                                <div className="news-meta">
-                                    <a href="#" className="post-author">Min Interest Rate {request.minInterestRate}%</a>
-                                    <a href="#" className="post-date">Max Interest Rate {request.maxInterestRate}%</a> 
+                        <div class="list-group-item list-group-item-action disabled">
+                            <div className="row">
+                                <div className="col-lg-2 col-sm-2 col-md-2 col-4">
+                                   <div className="news-thumbnail">
+                                     <img src="img/bg-img/7.jpg" alt=""/>
+                                    </div>
+                                </div>    
+                                <div className="col-lg-7 col-sm-7 col-md-7 col-8 content">
+                                    <div className="news-content">
+                                        <p style={{textTransform:'capitalize'}}>{request.user.name}</p>
+                                        <p style={{fontSize:14}}>NGN {request.requestAmount.toLocaleString()}</p>
+                                        <div className="news-meta">
+                                            <a href="#" className="post-author">Min Interest Rate {request.minInterestRate}%</a>
+                                        </div>
+                                        <div className="news-meta">
+                                            <a href="#" className="post-date">  Max Interest Rate {request.maxInterestRate}%</a> 
+                                        </div>
+                                    
+                                    </div>
                                 </div>
-                               
+                                <div className="col-lg-3 col-sm-12 col-md-3">
+                                       <div style ={{textAlign:'right'}}>
+                                       <button  name="submit" className="viewdetail" onClick ={() => ViewborrowerProfile(request)} type="submit"   id="" data-submit="...Sending">View Details</button>
+
+                                       </div>
+
+                                </div>   
                             </div>
                         </div>
-                    <div className="row">
-                        
-                        <div className="col-lg-12">
-                          <button name="submit" style={{padding:4}} onClick ={() => ViewborrowerProfile(request)} type="submit"   id="" data-submit="...Sending">View Details</button>
-                        </div>
-                    </div>
-                    
-                   
-                    </li>
+                     
                     )
-                }
-                    <div hidden = {all_borrowers_request.length == 0 && IsFetching == false ? false: true}>
+                   }
+                    <div hidden = {(all_borrowers_request != null && all_borrowers_request.length == 0 && IsFetching == false) ? false: true}>
                     <li className="list-group-item d-flex justify-content-between align-items-center" >
                         <div className="single-latest-news-area d-flex align-items-center">
                                 
@@ -130,7 +136,11 @@ const BorrowerMarket = (props) =>
                         </div>
                     </li>
                     </div>
-                    <Loader
+                    
+                  
+                </div>
+                <div style={{width:'100%',textAlign:'center'}}>
+                <Loader
                         visible={IsFetching}
                         type="Puff"
                         color="#ffbb38"
@@ -139,8 +149,7 @@ const BorrowerMarket = (props) =>
                         timeout= {0} //3 secs
                 
                     />
-                  
-                </ul>
+                </div>
               </div>
             </div>    
                

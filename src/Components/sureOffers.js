@@ -23,12 +23,14 @@ const SureOffers = (props) =>
     const [view_profile, setview_profile] = useState(false);
     const [lenderId, setlenderId] = useState(0);
     const [vaultId, setvaultId] = useState(0);
+    const [vaultdetail, setvaultdetail] = useState({});
     const [view_vault, setview_vault] = useState(false);
     const IsFetching = useSelector(state => state.root.IsFetching);
-    const SureOffers = useSelector(state => state.root.sureOffers);
+    let SureOffers = useSelector(state => state.root.sureOffers);
     const LoanRequestData = useSelector(state => state.root.loanrequest);
     const month = useSelector(state => state.root.month);
     const { handleSubmit, register, errors } = useForm();
+    const [offers, setoffers] = useState([]);
     const onSubmit = values => console.log(values);
 
     const connect = (lenderId, requestId, vaultId) => {
@@ -39,8 +41,85 @@ const SureOffers = (props) =>
 
     useEffect(() => {
         dispatch(GetUserLoanRequest());
+        processRequest();
         //alert(JSON.stringify(LoanRequestData));
     },[]);
+
+    const days = (from,to) => {
+        const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+        let fromyear = from.split('-')[0];
+        let frommonth = from.split('-')[1];
+        let fromday = from.split('-')[2];
+
+        let toyear = to.split('-')[0];
+        let tomonth = to.split('-')[1];
+        let today = to.split('-')[2];
+        const firstDate = new Date(fromyear, frommonth, fromday);
+        const secondDate = new Date(toyear, tomonth, today);
+
+        const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+        //alert(diffDays);
+        return diffDays;
+    }
+
+    const processRequest = () => {
+        if(LoanRequestData != null && LoanRequestData.request_type == 'peer to peer')
+        {
+            //alert(JSON.stringify(LoanRequestData));
+            setoffers(SureOffers);
+        }
+        if(LoanRequestData != null && Object.keys(LoanRequestData).length > 0 && LoanRequestData.request_type == 'open request')
+        {
+            let offerlist = [];
+            if(LoanRequestData.requestAmount > 0)
+            {
+                //alert(JSON.stringify(offers));
+                //alert(event.target.value);
+                offerlist = SureOffers.filter(function (offer) {
+                   // return parseFloat(LoanRequestData.requestAmount) >= 9000000000
+                    return parseFloat(LoanRequestData.requestAmount) >= parseFloat(offer.minRequestAmount) &&
+                           parseFloat(LoanRequestData.requestAmount) <= parseFloat(offer.maxRequestAmount)
+                });
+
+                //alert(JSON.stringify(offerlist));
+
+            } 
+            if(LoanRequestData.maxInterestRate > 0)
+            {
+                offerlist = offerlist.filter(function (offer) {
+                    return parseFloat(offer.minInterestperMonth) <= parseFloat(LoanRequestData.maxInterestRate)
+                });
+            }
+            if(LoanRequestData.loanperiod > 0)
+            {
+                offerlist = offerlist.filter(function (offer) {
+                    let offerdays = days(offer.availablefrom,offer.availableto);
+                    let loandays = parseFloat(LoanRequestData.loanperiod) * 30;
+                    return offerdays >= loandays
+                });
+            }
+            if(LoanRequestData.lender_country_id != '')
+            {
+                offerlist = offerlist.filter(function (offer) {
+                    return parseFloat(offer.borrower_country_id) == parseFloat(LoanRequestData.lender_country_id)
+                });
+            }
+            if(LoanRequestData.lender_state_id != '')
+            {
+                offerlist = offerlist.filter(function (offer) {
+                    return parseFloat(offer.borrower_state_id) == parseFloat(LoanRequestData.lender_state_id)
+                });
+            }
+            if(LoanRequestData.lender_city_id != '')
+            {
+                offerlist = offerlist.filter(function (offer) {
+                    return parseFloat(offer.borrower_city_id) == parseFloat(LoanRequestData.lender_city_id)
+                });
+            }
+            //alert(JSON.stringify(offerlist));
+            setoffers(offerlist);
+        }
+    }
 
     const FormatDate = (date) => {
         let d = date.split('-');
@@ -54,6 +133,7 @@ const SureOffers = (props) =>
         setview_profile(true);
         setlenderId(offer.user.id);
         setvaultId(offer.id);
+        setvaultdetail(offer);
     }
 
     return(
@@ -73,16 +153,16 @@ const SureOffers = (props) =>
                 </div>
             </section>
             <div hidden={!view_profile} style={{position:'fixed',right:0,top:0,width:'60%',height:'100%',overflowY:'scroll',zIndex:4000343005,backgroundColor:'#fff',padding:10}}>
-                    <div>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_profile(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
-                        <div id="user">
+                        <div id="">
                             {
                                LoanRequestData !=null && vaultId > 0 && lenderId > 0 &&
-                               <ViewProfile lenderId ={lenderId} vaultId ={vaultId} requestId = {LoanRequestData.id} />
+                               <ViewProfile lenderId ={lenderId} vaultdetail = {vaultdetail} vaultId ={vaultId} requestId = {LoanRequestData.id} />
                             } 
                         </div>
                     </div>
@@ -102,59 +182,58 @@ const SureOffers = (props) =>
             <section>
             <div className="profilecontainer"> 
               <div id="contact">
-              <ul className="list-group">
+              <div className="list-group">
                   {
-                      SureOffers.length > 0 &&
-                      SureOffers.map((offer) => 
-                 
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="single-latest-news-area d-flex align-items-center">
-                            <div className="news-thumbnail">
-                                <img src="img/bg-img/7.jpg" alt=""/>
-                            </div>
-                            <div className="news-content">
-                                <p href="#">{offer.user.name}</p>
-                                <div className="news-meta">
-                                    <a href="#" className="post-author">Min Interest Rate {offer.minInterestperMonth}%</a>
-                                    <a href="#" className="post-date">Max Interest Rate {offer.maxInterestperMonth}%</a> 
+                      offers != null &&
+                      offers.length > 0 &&
+                      offers.map((offer) => 
+                        <div class="list-group-item list-group-item-action disabled">
+                            <div className="row">
+                                <div className="col-lg-2 col-sm-2 col-md-2 col-4">
+                                   <div className="news-thumbnail">
+                                     <img src="img/bg-img/7.jpg" alt=""/>
+                                    </div>
+                                </div>    
+                                <div className="col-lg-7 col-sm-7 col-md-7 col-8 content">
+                                    <div className="news-content">
+                                        <p style={{textTransform:'capitalize'}}>{offer.user.name}</p>
+                                        <p style={{fontSize:14}}>NGN {offer.fundamount.toLocaleString()}</p>
+                                        <div className="news-meta">
+                                            <a className="post-author">Min Interest Rate {offer.minInterestperMonth}%</a>
+                                        </div>
+                                        <div className="news-meta">
+                                            <a href="#" className="post-date">  Max Interest Rate {offer.maxInterestperMonth}%</a> 
+                                        </div>
+                                    
+                                    </div>
                                 </div>
-                               
+                                <div className="col-lg-3 col-sm-12 col-md-3">
+                                       <div style ={{textAlign:'right'}}>
+                                       <button name="submit" className="viewdetail" style={{padding:4}} onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
+                                    
+                                       </div>
+
+                                </div>   
                             </div>
                         </div>
-                    <div className="row">
-                        
-                        <div className="col-lg-12">
-                          <button name="submit" style={{padding:4}} onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
+                     
+                    )
+                   }
+                    <div hidden = {(offers != null && offers.length == 0 || LoanRequestData == null) ? false: true}>
+                    <li className="list-group-item d-flex justify-content-between align-items-center" >
+                        <div className="single-latest-news-area d-flex align-items-center">
+                                
+                                <div className="news-content">
+                                    <p href="#">No Request Found</p>
+                                    
+                                </div>
                         </div>
+                    </li>
                     </div>
                     
-                   
-                    </li>
-                    )
-                }
-                    <div hidden = {SureOffers.length == 0 && LoanRequestData != null ? false: true}>
-                    <li className="list-group-item d-flex justify-content-between align-items-center" >
-                        <div className="single-latest-news-area d-flex align-items-center">
-                                
-                                <div className="news-content">
-                                    <p href="#">No Offers meet your requirement</p>
-                                    
-                                </div>
-                        </div>
-                    </li>
-                    </div>
-                    <div hidden = {LoanRequestData == null ? false: true}>
-                    <li className="list-group-item d-flex justify-content-between align-items-center" >
-                        <div className="single-latest-news-area d-flex align-items-center">
-                                
-                                <div className="news-content">
-                                    <p href="#">You don't have a loan request</p>
-                                    
-                                </div>
-                        </div>
-                    </li>
-                    </div>
-                </ul>
+                  
+                </div>    
+             
               </div>
             </div>    
                

@@ -5,7 +5,7 @@ import '../../css/css/analytics.css'
 import Footer from '../Footer';
 import Analytics from '../analytics';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCoffee, faTrash, faTimesCircle, faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 import SureRequest from '../sureRequest';
 import Loader from 'react-loader-spinner';
 import ReactNotification from 'react-notifications-component';
@@ -13,7 +13,7 @@ import 'react-notifications-component/dist/theme.css';
 import { store } from 'react-notifications-component';
 import {useSelector, useDispatch } from 'react-redux';
 import Sidebar from './sidebar';
-import {  GetBorrowersRepayment } from '../redux/action/index';
+import {  GetLenderRepaymentfromBorrower } from '../redux/action/index';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import Request from './Request';
@@ -21,7 +21,7 @@ import Request from './Request';
 const RepaymentOrder = (props) => {
 
     const dispatch = useDispatch();
-    const repayments = [];//useSelector(state => state.root.repayments_lender);
+    const repayments = useSelector(state => state.root.repayments_lender);
     const requestID = useSelector(state => state.root.repaymentsonrequestId);
     const [IsFetching, setIsFetching] = useState(false);
     const [view_more, setview_more] = useState(false);
@@ -30,13 +30,14 @@ const RepaymentOrder = (props) => {
 
     useEffect(() =>{
         getdata();
+        //alert(requestID);
     },[requestID]);
 
     const getdata = async () =>
     {
         setIsFetching(true);
-        await dispatch(GetBorrowersRepayment());
-        //alert(JSON.stringify(repayments));
+        await dispatch(GetLenderRepaymentfromBorrower());
+        //alert('djjdd');
         setIsFetching(false);
     }
 
@@ -51,6 +52,16 @@ const RepaymentOrder = (props) => {
     }
     return (
     <div>    
+    <div> 
+     <div className="row">
+         <div className ="col-xl-1">
+             <FontAwesomeIcon icon={faAngleLeft} onClick={() => props.previousStep()} style={{color:'#ff6c00',fontSize:45}} />
+         </div>
+         <div className ="col-xl-2">
+             <p style={{marginTop:10,marginLeft:-30, color:"#ff6c00"}}>Back</p>
+         </div>
+     </div>
+    </div>     
     <div hidden = {IsFetching} className="table-responsive ">
     <table className="table">
         <thead>
@@ -65,6 +76,8 @@ const RepaymentOrder = (props) => {
         </thead>
         <tbody>
         {
+            
+            repayments != null && repayments.length > 0 &&
             repayments.map((request,id) =>
             <tr>
                 <td>{id+1} </td>
@@ -107,9 +120,20 @@ const RepaymentOrder = (props) => {
        
     </table>
     {
-            repayments.length == 0 &&
+            repayments != null && repayments.length == 0 &&
             <div style={{textAlign:'center', marginTop:20,width:'100%'}}>No Data Found</div>
     }
+    <div style={{textAlign:'center',marginTop:'35%'}}>
+			<Loader
+				visible={IsFetching}
+				type="Puff"
+				color="#ffbb38"
+				height={30}
+				width={30}
+				timeout= {0} //3 secs
+		
+			/>
+		</div>
     </div></div>);
 }
 

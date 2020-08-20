@@ -5,7 +5,7 @@ import '../../css/css/analytics.css'
 import Footer from '../Footer';
 import Analytics from '../analytics';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCoffee, faTrash, faTimesCircle, faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import SureRequest from '../sureRequest';
 import Loader from 'react-loader-spinner';
 import ReactNotification from 'react-notifications-component';
@@ -50,10 +50,10 @@ const Vault = (props) =>
     return(
         <section className="lattest-product-area pb-40 category-list">
             <ReactNotification />
-                <div hidden={!view_more} className="sideview">
-                    <div>
+                <div hidden={!view_more} className="sideview2" style={{padding:10}}>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
-                        <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
+                        <FontAwesomeIcon icon={faWindowClose} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
@@ -63,6 +63,7 @@ const Vault = (props) =>
                         </div>
                     </div>
                 </div>
+               
 				<div hidden = {IsFetching} className="table-responsive">
                     <table className="table">
                         <thead>
@@ -104,7 +105,7 @@ const Vault = (props) =>
                                     {surevault.minInterestperMonth}%
                                 </td>
                                 <td>
-                                    <button onClick = {() => requestInformation(surevault)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:7}}>Transaction</button>
+                                    <button onClick = {() => requestInformation(surevault)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Transaction</button>
                                 
                                 </td>
                             </tr>

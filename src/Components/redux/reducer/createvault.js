@@ -18,6 +18,7 @@ const initialState = {
     maxInterestperMonth:'',
     borrower_country_id:'',
     borrower_state_id:'',
+    borrower_city_id:'',
     email_must_be_verified:'',
     phonenumber_must_be_verified:'',
     bvn_must_be_verified:'',
@@ -60,7 +61,8 @@ export function CreateVaultReducer(state = initialState, action)
     {
         return Object.assign({}, state, {
             borrower_country_id: action.data.borrower_country_id,
-            borrower_state_id:action.data.borrower_state_id
+            borrower_state_id:action.data.borrower_state_id,
+            borrower_city_id: action.data.borrower_city_id
         });
     }
     if(action.type == OTHERS)

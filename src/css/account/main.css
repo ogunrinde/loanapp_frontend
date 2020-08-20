@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700|Open+Sans:300,400,600,700");
+ 
+ 
  * {
       margin: 0px; 
       padding: 0px; 
@@ -6,12 +9,12 @@
   
   body, html {
       height: 100%;
-      font-family: Poppins-Regular, sans-serif;
+      font-family: "Roboto", sans-serif !important;
   }
   
   /*---------------------------------------------*/
   a {
-      font-family: Poppins-Regular, sans-serif !important;
+    font-family: "Roboto", sans-serif !important;
       font-size: 14px;
       line-height: 1.7;
       color: #666666;
@@ -37,7 +40,7 @@
   }
   
   p {
-      font-family: Poppins-Regular;
+      font-family: "Roboto", sans-serif !important;
       font-size: 18px;
       line-height: 1.7;
       color: #666666;
@@ -112,14 +115,14 @@
   /*==================================================================
   [ Text ]*/
   .txt1 {
-    font-family: Montserrat-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 13px;
     line-height: 1.4;
     color: #555555;
   }
   
   .txt2 {
-    font-family: Montserrat-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 13px;
     line-height: 1.4;
     color: #999999;
@@ -220,7 +223,7 @@
   .login100-form-title {
     width: 100%;
     display: block;
-    font-family: Poppins-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 30px;
     color: #333333;
     line-height: 1.2;
@@ -229,7 +232,7 @@
   label{
     color: #838383;
     font-size: 18px;
-    font-family: Poppins-Regular;
+    font-family: "Roboto", sans-serif !important;
     margin-bottom: 10px !important;
   }
   
@@ -255,7 +258,7 @@
   }
   
   .label-input100 {
-    font-family: Montserrat-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 18px;
     color: #999999;
     line-height: 1.2;
@@ -278,7 +281,7 @@
     display: block;
     width: 100%;
     background: transparent;
-    font-family: Montserrat-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 18px;
     color: #555555;
     line-height: 1.0;
@@ -369,7 +372,7 @@
   }
   
   .label-checkbox100 {
-    font-family: Poppins-Regular;
+    font-family: "Roboto", sans-serif !important;
     font-size: 16px;
     color: #999999;
     line-height: 1.4;
@@ -518,7 +521,7 @@
     right: 12px;
     pointer-events: none;
   
-    font-family: Poppins-Regular;
+    font-family: "Roboto", sans-serif !important;
     color: #c80000;
     font-size: 13px;
     line-height: 1.4;

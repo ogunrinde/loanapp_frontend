@@ -26,8 +26,13 @@ import AllLoanRequest from './Account/allloanrequest';
 import {withRouter} from 'react-router-dom';
 import Verification from './Account/Verification';
 import OpenRepaymentforLender from './Account/openrepayment';
-import ClosedRepaymentforLender from './Account/closedrepayment';
-
+//import ClosedRepaymentforLender from './Account/closedrepayment';
+import Profile from '../Components/Profile';
+import BorrowerOverDues from './Account/overdues_borrower';
+import LenderOverDues from './Account/overdues_lender';
+import RepaymentforBorrower from './Account/repaymentforborrower';
+import BorrowerRequestList from './Account/borrowerviewpaymentschedules';
+import LenderDisbursedList from './Account/lenderviewpaymentschedules';
 
 import {
 	BrowserRouter as Router,
@@ -53,7 +58,14 @@ function ProcessRequest()
 	else if(routerequest == 'myloanrequest') return (<AllLoanRequest />);
 	else if(routerequest == 'verify') return (<Verification />);
 	else if(routerequest == 'open_repayment_lender') return (<OpenRepaymentforLender />);
-	else if(routerequest == 'closed_repayment_lender') return (<ClosedRepaymentforLender />);
+	//else if(routerequest == 'closed_repayment_lender') return (<ClosedRepaymentforLender />);
+	else if(routerequest == 'profile') return (<Profile />);
+	else if(routerequest == 'overdues_borrower') return (<BorrowerOverDues />);
+	else if(routerequest == 'overdues_lender') return (<LenderOverDues />);
+	else if(routerequest == 'repayment_borrower') return (<RepaymentforBorrower />);
+	else if(routerequest == 'paymentschedules') return (<BorrowerRequestList />);
+    else if(routerequest == 'paymentschedules_lender') return (<LenderDisbursedList />);
+	//else if(routerequest == 'closed_repayment_borrower') return (<ClosedRepaymentforBorrower />);
 	// else if(routerequest == 'overdues_lender') return (<OverduesforLender />);
 	// else if(routerequest == 'open_repayment_borrower') return (<OpenRepaymentforBorrower />);
 	// else if(routerequest == 'closed_repayment_borrower') return (<ClosedRepaymentforBorrower />);
@@ -89,20 +101,11 @@ const Home = (props) =>
         <div className="container" style={{marginBottom:30}}>
 		<div className="row" style={{marginBottom:25}}>
 			<div className="col-xl-12">
-			<div className="filter-bar d-flex flex-wrap">
-					<div className="sorting">
-						<select className="form-control">
-							<option value="1">Default sorting</option>
-							<option value="1">Default sorting</option>
-							<option value="1">Default sorting</option>
-						</select>
-					</div>
-					<div className="sorting mr-auto">
-						<select className="form-control">
-							<option value="1">Show 12</option>
-							<option value="1">Show 12</option>
-							<option value="1">Show 12</option>
-						</select>
+			<div className="" style={{backgroundColor:'#828bb3',padding:10}}>
+					<div style={{color:'#fff',fontSize:25}}>
+						
+							Pending Request
+						
 					</div>
 					
 				</div>
@@ -112,20 +115,17 @@ const Home = (props) =>
 		<div className="row">
 			<div className="col-xl-3 col-lg-4 col-md-5">
 				<div className="sidebar-categories">
-					<div className="head">Browse Categories</div>
+					<div className="head">Browse Activities</div>
 					<ul className="main-categories">
-						<li className="main-nav-list"><a data-toggle="collapse" href="#fruitsVegetable" aria-expanded="false" aria-controls="fruitsVegetable"><span
-								 className="lnr lnr-arrow-right"></span>Home<span className="number">(53)</span></a>
-							
-						</li>
+						
 
 						<li className="main-nav-list"><a data-toggle="collapse" href="#loan" aria-expanded="false" aria-controls="loan"><span
-								 className="lnr lnr-arrow-right"></span>My Vault Loan</a>
+								 className="lnr lnr-arrow-right"></span>My Sure Offers</a>
 							<ul className="collapse" id="loan" data-toggle="collapse" aria-expanded="false" aria-controls="loan">
-								<li className="main-nav-list child"><Link to={`${url}/pendingapprovals`}>Loan Approval</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/pendingapprovals`}>Pending Loans</Link></li>
 								<li className="main-nav-list child"><Link to={`${url}/approvedloans`}>Approved Loans</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/loantobedisbursed`}>To be Disbursed<span className="number">(09)</span></Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/loan_disbursed`}>Loan Disbursed<span className="number">(17)</span></Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/loantobedisbursed`}>To be Disbursed<span className="number"></span></Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/loan_disbursed`}>Loan Disbursed<span className="number"></span></Link></li>
 							</ul>
 						</li>
 
@@ -139,33 +139,34 @@ const Home = (props) =>
 						</li>
 
 						<li className="main-nav-list"><a data-toggle="collapse" href="#vault" aria-expanded="false" aria-controls="vault"><span
-								 className="lnr lnr-arrow-right"></span>Vault</a>
+								 className="lnr lnr-arrow-right"></span>Sure Vault</a>
 							<ul className="collapse" id="vault" data-toggle="collapse" aria-expanded="false" aria-controls="vault">
-								<li className="main-nav-list child"><Link to={`${url}/vault`} href="#">My Vault</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/vault`}>My Vault</Link></li>
 							</ul>
 						</li>
 
 						<li className="main-nav-list"><a data-toggle="collapse" href="#repayment_borrower" aria-expanded="false" aria-controls="repayment_borrower"><span
 								 className="lnr lnr-arrow-right"></span>My Repayment</a>
 							<ul className="collapse" id="repayment_borrower" data-toggle="collapse" aria-expanded="false" aria-controls="repayment_borrower">
-								<li className="main-nav-list child"><Link to={`${url}/open_repayment_borrower`} href="#">Open</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/closed_repayment_borrower`} href="#">Closed</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/overdues_borrower`} href="#">Overdues</Link></li>
+							    <li className="main-nav-list child"><Link to={`${url}/paymentschedules`}>Payment Schedule</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/repayment_borrower`}>Repayment</Link></li>
+								{/* <li className="main-nav-list child"><Link to={`${url}/overdues_borrower`}>Overdues</Link></li> */}
 							</ul>
 						</li>
 
 						<li className="main-nav-list"><a data-toggle="collapse" href="#repayment_lender" aria-expanded="false" aria-controls="repayment_lender"><span
 								 className="lnr lnr-arrow-right"></span>Borrower Repayment</a>
 							<ul className="collapse" id="repayment_lender" data-toggle="collapse" aria-expanded="false" aria-controls="repayment_lender">
-								<li className="main-nav-list child"><Link to={`${url}/open_repayment_lender`} href="#">Open</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/closed_repayment_lender`} href="#">Closed</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/overdues_lender`} href="#">Overdues</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/paymentschedules_lender`}>Payment Schedule</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/open_repayment_lender`}>Repayment</Link></li>
+								{/* <li className="main-nav-list child"><Link to={`${url}/overdues_lender`}>Overdues</Link></li> */}
 							</ul>
 						</li>
 
 						<li className="main-nav-list"><a data-toggle="collapse" href="#profile" aria-expanded="false" aria-controls="profile"><span
 								 className="lnr lnr-arrow-right"></span>Profile</a>
 							<ul className="collapse" id="profile" data-toggle="collapse" aria-expanded="false" aria-controls="profile">
+							    <li className="main-nav-list child"><Link to={`${url}/profile`} href="#">Complete your Profile</Link></li>
 								<li className="main-nav-list child"><Link to={`${url}/myprofile`} href="#">My Profile</Link></li>
 								<li className="main-nav-list child"><Link to={`${url}/verify`} href="#">Verification</Link></li>
 							</ul>

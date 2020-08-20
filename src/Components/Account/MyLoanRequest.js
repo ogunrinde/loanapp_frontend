@@ -76,7 +76,7 @@ const BorrowerApprovedRequest = (props) =>
                             loantobedisbursed.map((request,id) =>
                             <tr>
                                 <td>
-                                    <p>{id+1}</p>
+                                    {id+1}
                                 </td>
                                 <td>
                                     <div className="media">

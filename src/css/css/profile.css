@@ -22,7 +22,31 @@
   overflow-y:scroll;
   z-index:4000343005;
   background-color:#fff;
-  padding:10;
+  padding:50 !important;
+}
+
+.sideview2{
+  position:fixed;
+  right:0;
+  top:0;
+  width:60%;
+  height:100%;
+  overflow-y:scroll;
+  z-index:4000343005;
+  background-color:#fff;
+  padding:50 !important;
+}
+
+.content{
+  margin-left: -70px;
+}
+
+.viewdetail{
+  margin-top: 10px !important;
+  width: 100%;
+  margin-top: 45px !important;
+  padding:4px !important;
+  width:40% !important;
 }
 
 
@@ -184,8 +208,19 @@ select option {
   }
   .sideview{
     position:fixed;
-    width:100%;
+    width:100% !important;
   }
+  .sideview2{
+    position:fixed;
+    width:100% !important;
+  }
+  #contact {
+    padding: 2px;
+  }
+  .content{
+    margin-left: 0px;
+  }
+
 }
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   .profilecontainer {
@@ -193,7 +228,18 @@ select option {
   }
   .sideview{
     position:fixed;
-    width:100%;
+    width:100% !important;
+  }
+
+  .sideview2{
+    position:fixed;
+    width:100% !important;
+  }
+  #contact {
+    padding: 2px;
+  }
+  .content{
+    margin-left: 0px;
   }
 }
 @media only screen and (max-width: 767px) {
@@ -202,6 +248,22 @@ select option {
   }
   .sideview{
     position:fixed;
-    width:100%;
+    width:100% !important;
+  }
+  .sideview2{
+    position:fixed;
+    width:100% !important;
+  }
+  #contact {
+    padding: 2px;
+  }
+  .viewdetail{
+    margin-top: 10px !important;
+    width: 100%;
+    padding:4px !important;
+    width:40% !important;
+  }
+  .content{
+    margin-left: -20px;
   }
 }

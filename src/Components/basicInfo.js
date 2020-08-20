@@ -4,7 +4,7 @@ import '../css/css/profile.css';
 import { useForm } from "react-hook-form";
 import { places, countrystates } from '../Components/redux/action/index';
 import { useSelector, useDispatch } from 'react-redux'; 
-import { userbasicInfo } from '../Components/redux/action/index';
+import { userbasicInfo, countrycodes } from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
 
 
@@ -16,12 +16,14 @@ const BasicInfo = (props) =>
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
     const IsFetching = useSelector(state => state.root.IsFetching);
+    const codes = useSelector(state => state.root.codes);
     const { handleSubmit, register, errors } = useForm();
 
     useEffect(() =>{
-        //setisLoadingCountries(true);
+        setisLoadingCountries(true);
         dispatch(places());
-        //setisLoadingCountries(false);
+        dispatch(countrycodes());
+        setisLoadingCountries(false);
     },[]);
 
     const handleChange = (event) => {
@@ -33,6 +35,9 @@ const BasicInfo = (props) =>
     const onSubmit = async (data) =>
     {
         //console.log(data);
+        data.mobile1 = `${data.mobile1code}${data.mobile1}`;
+        data.mobile2 = `${data.mobile2code}${data.mobile2}`;
+        //alert(JSON.stringify(data));
         await dispatch(userbasicInfo(data,props));
         props.nextStep();
     }
@@ -117,7 +122,30 @@ const BasicInfo = (props) =>
                 <div className="row">
                     <div className="col-lg-6 col-sm-12 col-md-6">
                     <fieldset>
-                       <input 
+                    <div className="row no-gutters">
+                        <div className="col-lg-5 col-sm-5 col-md-5">
+                            <select 
+                            name="mobile1code"
+                            style={{height:45, color:'#777777'}}
+                            ref={register({
+                                required: "Required",
+                            })}
+                            >
+                            <option value="">Phone Code</option>
+                            {
+                                codes != null &&
+                                codes.map((code) => 
+                                    <option value={code.code}>{code.name}</option>
+                                )
+                            }
+                            
+                            </select> 
+                            <small className="text-danger">{errors.mobile1code?.type == "required" && "Phone Number Code is required"}</small><br/>
+
+                        </div>
+                        <div className="col-lg-1 col-sm-1 col-md-1"></div>
+                        <div className="col-lg-6 col-sm-6 col-md-6">
+                        <input 
                             placeholder="Phone Number" 
                             type="number" 
                             tabindex="1" 
@@ -125,24 +153,59 @@ const BasicInfo = (props) =>
                             name="mobile1"
                             ref={register({
                                 required: "Required",
-                                minLength:11,
-                                maxLength:11
+                                min:100,
+                                max:99999999999999
                             })}
                         />
                         <small className="text-danger">{errors.mobile1?.type == "required" && "Phone Number is required"}</small>
-                        <small className="text-danger">{errors.mobile1?.type == "minLength" && "Max of 11 Character is required"}</small>
+                        <small className="text-danger">{(errors.mobile1?.type == "min" || errors.mobile1?.type == "max") && "Invalid Phone Number"}</small>
+                        </div>
+                    </div>  
+                            
                     </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
-                        <input 
-                            placeholder="Phone Number 2" 
-                            type="number" 
-                            tabindex="1" 
-                            autofocus
-                            name="mobile2"
-                            
-                        />
+                          <div className="row no-gutters">
+                               <div className="col-lg-5 col-sm-5 col-md-5">
+                                 <select 
+                                    name="mobile2code"
+                                    style={{height:45,color:'#777777'}}
+                                    ref={register({
+                                        required: "Required",
+                                    })}
+                                 >
+                                 <option value="">Phone Code</option>   
+                                    {
+                                        codes != null &&
+                                        codes.map((code) => 
+                                            <option value={code.code}>{code.name}</option>
+                                        )
+                                    }
+                                    
+                                 </select> 
+                                 <small className="text-danger">{errors.mobile2code?.type == "required" && "Phone Code is Required"}</small><br/>
+
+                               </div>
+                               <div className="col-lg-1 col-sm-1 col-md-1"></div>
+                               <div className="col-lg-6 col-sm-6 col-md-6">
+                               <input 
+                                    placeholder="Phone Number 2" 
+                                    type="number" 
+                                    tabindex="1" 
+                                    autofocus
+                                    name="mobile2"
+                                    ref={register({
+                                        required: "Required",
+                                        min:100,
+                                        max:99999999999999
+                                    })}
+                                />
+                                 <small className="text-danger">{errors.mobile2?.type == "required" && "Phone Number is required"}</small>
+                                 <small className="text-danger">{(errors.mobile2?.type == "min" || errors.mobile2?.type == "max") && "Invalid Phone Number"}</small>
+                               </div>
+                          </div>  
+                           
                         </fieldset>
                     </div>
                 </div>
@@ -168,7 +231,7 @@ const BasicInfo = (props) =>
                         <fieldset>
                         <select 
                             name="gender"
-                            style={{color:'#777777'}}    
+                            style={{color:'#777777',height:45}}    
                             ref={register({
                                 required: "Required",
                             })}

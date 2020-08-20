@@ -18,6 +18,8 @@ import Sidebar from './sidebar';
 import Request from './Request';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
+import { GetCompleteUserProfile } from '../redux/action/index';
+
 
 const MyProfile = (props) => 
 {
@@ -32,10 +34,12 @@ const MyProfile = (props) =>
     const [ IsFetching, setIsFetching ] = useState(false);
     
     useEffect(() => {
-       
+        setIsFetching(true);
+        if(IsLoggedIn == true) dispatch(GetCompleteUserProfile());
+        setIsFetching(false);
     },[]);
 
-    if(Object.keys(userdetails).length > 0)
+    if(userdetails != null && Object.keys(userdetails).length > 0)
     {
 		//console.log(request);
         $('ul.tabs li').click(function(){
@@ -49,200 +53,255 @@ const MyProfile = (props) =>
 	}
 
     return(
-        <section className="lattest-product-area pb-40 category-list">
-            <ReactNotification />
-            <div style={{height:'100%',clear:'both'}}>  
-            <Tabs defaultIndex={0}>
-                            <TabList style ={{borderColor:'green'}}>
-                            <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Bank Information</Tab>
-                            <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Employment Information</Tab>
-                            <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Social Media Information</Tab>
-                            <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Bank Information</Tab>
-                            </TabList>
+            <section className="lattest-product-area pb-40 category-list">
+                <ReactNotification />
+                <div style={{height:'100%',clear:'both'}}>  
+                <Tabs defaultIndex={0}>
+                                <TabList style ={{borderColor:'#fff'}}>
+                                <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Bank Information</Tab>
+                                <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Employment Information</Tab>
+                                <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Social Media Information</Tab>
+                                <Tab style={{backgroundColor:'#828bb3',color:'#fff',borderColor:'#828bb3',marginRight:2}}>Bank Information</Tab>
+                                </TabList>
+                            
+                                <TabPanel>
+                                {
+                                    userhomeaddress != null &&
+                                    <div id="basicInformation">
                         
-                            <TabPanel>
-                             <div id="basicInformation">
-					
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Surname</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.surname}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Firstname</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.firstname}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Middlename</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.middlename}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Gender</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.gender}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Mobile Number 1</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.mobile1}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Mobile Number 2</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.mobile2}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Date of Birth</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userdetails.date_of_birth}
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            </TabPanel>
-                            <TabPanel>
-                              <div id="officeaddress">
-					
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Employment Status</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userofficeaddress.employmentstatus}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Office Address</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userofficeaddress.address}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Contact Number</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userofficeaddress.contact_number}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Contact Website</p>
-                                    </div>
-                                    <div className="desc">
-                                        {userofficeaddress.contact_website}
-                                    </div>
-                                </div>
-                        
-                            </div>
-                            </TabPanel>
-                            <TabPanel>
-                            <div id="social">
-					
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Facebook Account</p>
-                                    </div>
-                                    <div className="desc">
-                                        {usersocialmedia.facebook}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Instagram Account</p>
-                                    </div>
-                                    <div className="desc">
-                                        {usersocialmedia.instagram}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>LinkedIn Account</p>
-                                    </div>
-                                    <div className="desc">
-                                        {usersocialmedia.linkedin}
-                                    </div>
-                                </div>
-                                <div className="bio-box">
-                                    <div className="heading">
-                                        <p>Twitter Account</p>
-                                    </div>
-                                    <div className="desc">
-                                        {usersocialmedia.twitter}
-                                    </div>
-                                </div>
-                        
-                            </div>
-                            </TabPanel>
-                            <TabPanel>
-                            <div id="backinfo">
-					
                                     <div className="bio-box">
                                         <div className="heading">
-                                            <p>BVN</p>
+                                            <p>Surname</p>
                                         </div>
                                         <div className="desc">
-                                            {bankdetail.bvn}
+                                            {userdetails.surname}
                                         </div>
                                     </div>
                                     <div className="bio-box">
                                         <div className="heading">
-                                            <p>Account Number</p>
+                                            <p>Firstname</p>
                                         </div>
                                         <div className="desc">
-                                            {bankdetail.accountnumber}
+                                            {userdetails.firstname}
                                         </div>
                                     </div>
                                     <div className="bio-box">
                                         <div className="heading">
-                                            <p>Account Name</p>
+                                            <p>Middlename</p>
                                         </div>
                                         <div className="desc">
-                                            {bankdetail.bankname}
+                                            {userdetails.middlename}
+                                        </div>
+                                    </div>
+                                    <div className="bio-box">
+                                        <div className="heading">
+                                            <p>Gender</p>
+                                        </div>
+                                        <div className="desc">
+                                            {userdetails.gender}
+                                        </div>
+                                    </div>
+                                    <div className="bio-box">
+                                        <div className="heading">
+                                            <p>Mobile Number 1</p>
+                                        </div>
+                                        <div className="desc">
+                                            {userdetails.mobile1}
+                                        </div>
+                                    </div>
+                                    <div className="bio-box">
+                                        <div className="heading">
+                                            <p>Mobile Number 2</p>
+                                        </div>
+                                        <div className="desc">
+                                            {userdetails.mobile2}
+                                        </div>
+                                    </div>
+                                    <div className="bio-box">
+                                        <div className="heading">
+                                            <p>Date of Birth</p>
+                                        </div>
+                                        <div className="desc">
+                                            {userdetails.date_of_birth}
                                         </div>
                                     </div>
                                     
+                                    </div>
+                                }    
+                                {
+                                    userhomeaddress == null &&
+                                    <div className="bio-box">
+                                            <div className="heading">
+                                                <p>No Data Found</p>
+                                            </div>
+                                    </div>
+                                }
+                                
+                                </TabPanel>
+                                <TabPanel>
+                                {   
+                                    userofficeaddress != null && 
+                                    <div id="officeaddress">
                             
-                            </div>
-                            </TabPanel>
-            </Tabs>
-                <div style={{textAlign:'center',marginTop:100}}>
-                    <Loader
-                        visible={IsFetching}
-                        type="Puff"
-                        color="#ffbb38"
-                        height={30}
-                        width={30}
-                        timeout= {0} //3 secs
-                
-                    />
-                </div>  
-            </div>        
-			</section>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Employment Status</p>
+                                            </div>
+                                            <div className="desc">
+                                                {userofficeaddress.employmentstatus}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Office Address</p>
+                                            </div>
+                                            <div className="desc">
+                                                {userofficeaddress.address}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Contact Number</p>
+                                            </div>
+                                            <div className="desc">
+                                                {userofficeaddress.contact_number}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Contact Website</p>
+                                            </div>
+                                            <div className="desc">
+                                                {userofficeaddress.contact_website}
+                                            </div>
+                                        </div>
+                                
+                                    </div>
+                                }
+                                {
+                                    userofficeaddress == null &&
+                                    <div className="bio-box">
+                                            <div className="heading">
+                                                <p>No Data Found</p>
+                                            </div>
+                                    </div>
+                                }
+                                </TabPanel>
+                                <TabPanel>
+                                {
+                                    usersocialmedia != null &&  
+                                    <div id="social">
+                            
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Facebook Account</p>
+                                            </div>
+                                            <div className="desc">
+                                                {usersocialmedia.facebook}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Instagram Account</p>
+                                            </div>
+                                            <div className="desc">
+                                                {usersocialmedia.instagram}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>LinkedIn Account</p>
+                                            </div>
+                                            <div className="desc">
+                                                {usersocialmedia.linkedin}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Twitter Account</p>
+                                            </div>
+                                            <div className="desc">
+                                                {usersocialmedia.twitter}
+                                            </div>
+                                        </div>
+                                
+                                    </div>
+                                }  
+                                {
+                                    usersocialmedia == null &&
+                                    <div className="bio-box">
+                                            <div className="heading">
+                                                <p>No Data Found</p>
+                                            </div>
+                                    </div>
+                                }  
+                                </TabPanel>
+                                <TabPanel>
+                                 {
+                                     bankdetail != null &&
+                                     <div id="backinfo">
+                        
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>BVN</p>
+                                            </div>
+                                            <div className="desc">
+                                                {bankdetail.bvn}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Account Number</p>
+                                            </div>
+                                            <div className="desc">
+                                                {bankdetail.accountnumber}
+                                            </div>
+                                        </div>
+                                        <div className="bio-box">
+                                            <div className="heading">
+                                                <p>Account Name</p>
+                                            </div>
+                                            <div className="desc">
+                                                {bankdetail.bankname}
+                                            </div>
+                                        </div>
+                                        
+                                
+                                </div>
+                                 } 
+                                 {
+                                    usersocialmedia == null &&
+                                    <div className="bio-box">
+                                            <div className="heading">
+                                                <p>No Data Found</p>
+                                            </div>
+                                    </div>
+                                 }   
+                                
+                                </TabPanel>
+                </Tabs>
+                    <div style={{textAlign:'center',marginTop:100}}>
+                        <Loader
+                            visible={IsFetching}
+                            type="Puff"
+                            color="#ffbb38"
+                            height={30}
+                            width={30}
+                            timeout= {0} //3 secs
+                    
+                        />
+                    </div>  
+                </div>   
+                 <Loader
+                    visible={IsFetching}
+                    type="Puff"
+                    color="#ffbb38"
+                    height={30}
+                    width={30}
+                    timeout= {0} //3 secs
+						
+				/>    
+            </section>
         
     );
 }

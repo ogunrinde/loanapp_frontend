@@ -27,7 +27,7 @@ const LoanTenor = (props) => {
                 <span>Complete the Information Below</span>
                 <div className="row" style={{marginTop:20,marginBottom:20}}>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                    <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Loan Tenor</p>    
+                    <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Loan Tenor (in Months)</p>    
                     <fieldset>
                        <input 
                             type="number" 
@@ -42,7 +42,7 @@ const LoanTenor = (props) => {
                     </fieldset>
                     </div>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Loan Tenor</p>  
+                        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Loan Tenor (in Months)</p>  
                         <fieldset>    
                         <input 
                             type="number" 

@@ -4,7 +4,7 @@ import '../css/css/checkbox.css';
 import {useSelector, useDispatch} from 'react-redux';
 import {useForm } from 'react-hook-form';
 import { Createvault_borrower } from '../Components/redux/action/createvault';
-import { places, countrystates, MakeAvailable} from '../Components/redux/action/index';
+import { places, countrystates, MakeAvailable, Getcities} from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
 
 
@@ -13,12 +13,19 @@ const Borrower = (props) => {
     const dispatch = useDispatch();
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
+    const [ isLoadingCities, setisLoadingCities ] = useState(false);
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
     const IsFetching = useSelector(state => state.root.IsFetching);
+    const cities = useSelector(state => state.root.cities);
+    const vaultcreated = useSelector(state => state.root.vaultcreated);
+
     const onSubmit = async (data, e) => {
+        //alert(JSON.stringify(data));
         await dispatch(Createvault_borrower(data));
         await dispatch(MakeAvailable());
+        if(vaultcreated == true) window.location.reload();
+        //alert(vaultcreated);
         //props.nextStep();
         //e.target.reset();
     }
@@ -28,6 +35,16 @@ const Borrower = (props) => {
         dispatch(countrystates(event.target.value));
         setisLoadingState(false);
     }
+
+    const handleState = (event) => {
+        //alert(event.target.value);
+        setisLoadingCities(true);
+        dispatch(Getcities(event.target.value));
+        setisLoadingCities(false);
+        //handleInput(event);
+    }
+
+
     return(
     <div className="profilecontainer"> 
     <div id="contact">
@@ -36,7 +53,7 @@ const Borrower = (props) => {
         <span>Complete the Information Below</span>
         <div className="row" style={{marginTop:20,marginBottom:20}}>
         <div className="col-lg-12 col-sm-12 col-md-12">
-        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Lender's Country</p>    
+        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's Country</p>    
         <fieldset>
         <select 
                 name="borrower_country_id"
@@ -57,10 +74,11 @@ const Borrower = (props) => {
         </fieldset>
         </div>
         <div className="col-lg-12 col-sm-12 col-md-12">
-        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Lender's State</p>        
+        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's State</p>        
         <fieldset>
         <select 
             name="borrower_state_id" 
+            onChange = {(text) => handleState(text)}
             placeholder=""
             style={{color:'#777777'}}    
                 ref={register({
@@ -77,6 +95,28 @@ const Borrower = (props) => {
             <small className="text-danger">{errors.borrower_state_id?.type == "required" && "State is required"}</small>
         </fieldset>
         </div>
+        <div className="col-lg-12 col-sm-12 col-md-12">
+        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's City</p>        
+        <fieldset>
+        <select 
+            name="borrower_city_id" 
+            placeholder=""
+            style={{color:'#777777'}}    
+                ref={register({
+                    required: "Required",
+                })}
+        >
+            <option value=""></option>
+            <option value ="">Select City</option>
+                {
+                    cities.map((city) =>
+                    <option value ={city.id}>{ city.name }</option>
+                )}
+        </select> 
+            <small className="text-danger">{errors.borrower_city_id?.type == "required" && "City is required"}</small>
+        </fieldset>
+        </div>
+     
       </div>
       <div className="row" style={{marginTop:20}}>
         <div className="col-lg-4 col-sm-12 col-md-4">

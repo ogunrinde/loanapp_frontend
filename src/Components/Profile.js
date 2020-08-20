@@ -40,22 +40,10 @@ const Profile = (props) =>
         <div>
            
             <ReactNotification />
-            <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
-                <div class="container h-100">
-                    <div class="row h-100 align-items-center">
-                        <div class="col-12">
-                            <div class="breadcrumb-content">
-                                <h2>Complete your Profile</h2>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section style={{backgroundColor:'#f1f7f9',padding:20,paddingBottom:40}}>
+            <section>
             {  
                 IsFetching == false && step != -1 &&
-                <div className="profilecontainer"> 
+                <div className="profilecontainer" style={{width:'100%'}}> 
                 <div id="contact">
                 <Stepper
                     styleConfig={{activeBgColor:'#ffbb38',inactiveBgColor:'#eee', completedBgColor:'#003679'}}
@@ -95,8 +83,7 @@ const Profile = (props) =>
                 </div>
             }
             </section>
-            <Footer />
-           
+
         </div>
         
     );

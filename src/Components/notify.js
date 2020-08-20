@@ -11,7 +11,7 @@ const Notify = () =>
             <div>
                 <div style={{padding:20,color:'#fff',textAlign:'center',}}>
                     Welcome On board....Click to complete your registration
-                    <Link style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}} to="/profile" data-animation="fadeInDown" data-delay="700ms">Complete your Registration</Link>
+                    <Link style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}} to="/home/profile" data-animation="fadeInDown" data-delay="700ms">Complete your Registration</Link>
                     </div>
             </div>
         </div>

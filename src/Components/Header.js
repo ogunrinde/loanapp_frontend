@@ -3,12 +3,20 @@ import { GetCompleteUserProfile,logout, requeststatus } from './redux/action/ind
 
 import {
     Link
+
   } from "react-router-dom";
   import '../css/css/header.css';
+  import '../css/css/profile.css';
   import { withRouter} from 'react-router-dom';
 import Notify from './notify';
 import { useDispatch, useSelector } from 'react-redux';
 import SlidingPanel from 'react-sliding-side-panel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { useForm } from 'react-hook-form';
+import Loader from 'react-loader-spinner';
+import {SendCode, VerifyPhone, GetEmailLink} from './redux/action/index';
+import { GetpendingApprovals } from './redux/action/loan';
 
 
 
@@ -26,15 +34,72 @@ const Header = (props) => {
     const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
     const user = useSelector(state => state.root.user);
     const IsFetching = useSelector(state =>state.root.IsFetching);
+    const [verify_phone, setverify_phone] = useState(false);
+    const [isSubmitting, setisSubmitting] = useState(false);
+    const { handleSubmit, register, errors } = useForm();
+    const LenderpendingApprovals = useSelector(state => state.root.lenderpendingApprovals);
+    const loantobedisbursed = useSelector(state => state.root.loantobedisbursed);
+    const [isRequestSeen, setisRequestSeen] = useState(false);
+    const [isloantobedisbursed, setisloantobedisbursed] = useState(false);
+
+
     useEffect(() =>{
+        //alert(IsLoggedIn);
         if(IsFetching == true) dispatch(requeststatus());
-        if(IsLoggedIn == true) dispatch(GetCompleteUserProfile());
+        if(IsLoggedIn == true){
+            dispatch(GetCompleteUserProfile());
+            process();
+        } 
+
     },[props]);
+
+    const showpending = () => {
+        setisRequestSeen(true);
+        props.history.push('/home/pendingapprovals');
+    }
+
+    const showtobedisbursed = () => {
+        isloantobedisbursed(true);
+        props.history.push('/home/loantobedisbursed');
+    }
 
     const log = () => {
         dispatch(logout());
         props.history.push('/');
     }
+
+    const process = () => {
+        dispatch(GetpendingApprovals());
+    }
+
+    const SendAgain = async () => {
+        setisSubmitting(true);
+        await dispatch(SendCode());
+        setisSubmitting(false);
+    }
+
+    const onSubmit = async (data) =>
+    {
+        //alert(JSON.stringify(data.code));
+        setisSubmitting(true);
+        await dispatch(VerifyPhone(data.code));
+        dispatch(GetCompleteUserProfile());
+        setisSubmitting(false);
+        setverify_phone(false);
+    }
+
+    const PhoneVerify = () => {
+        SendAgain();
+        setverify_phone(true);
+
+    }
+
+    const SendEmailLink = async () => {
+        setisSubmitting(true);
+        await dispatch(GetEmailLink(userdetails.email));
+        setisSubmitting(false);
+    }
+    
     return (
         <header className="header-area">
         <div className="top-header-area">
@@ -42,21 +107,21 @@ const Header = (props) => {
                 <div className="row h-100 align-items-center">
                     <div className="col-12 d-flex justify-content-between">
                         <div className="logo">
-                            <a href="index.html"><img src="../../img/core-img/logo.png" alt=""/></a>
+                            <Link to ="/"><img src="../../img/core-img/logo.png" alt=""/></Link>
                         </div>
                         {
                             IsLoggedIn == false && 
                             <div className="top-contact-info d-flex align-items-center">
-                                <Link to="/register" data-toggle="tooltip" data-placement="bottom" title="25 th Street Avenue, Los Angeles, CA"><img src="img/core-img/placeholder.png" alt=""/> <span>Create Account</span></Link>
-                                <Link to ="/login" data-toggle="tooltip" data-placement="bottom" title="office@yourfirm.com"><img src="../../img/core-img/message.png" alt=""/> <span>Login</span></Link>
+                                <Link to="/register" data-toggle="tooltip" data-placement="bottom" title="New! Create account"><img src="img/core-img/placeholder.png" alt=""/> <span>Create Account</span></Link>
+                                <Link to ="/login" data-toggle="tooltip" data-placement="bottom" title="Login to Participate"><img src="../../img/core-img/message.png" alt=""/> <span>Login</span></Link>
                             </div>
                         }
 
                         {
                             IsLoggedIn == true && 
                             <div className="top-contact-info d-flex align-items-center">
-                                <Link to="/home" data-toggle="tooltip" data-placement="bottom" title="25 th Street Avenue, Los Angeles, CA"><img src="img/core-img/placeholder.png" alt=""/> <span style={{textTransform:'capitalize'}}>Hi, {user.name}</span></Link>
-                                <Link onClick = {log} data-toggle="tooltip" data-placement="bottom" title="office@yourfirm.com"><img src="../../img/core-img/message.png" alt=""/> <span>Logout</span></Link>
+                                <Link to="/home" data-toggle="tooltip" data-placement="bottom" title="Hi User"><img src="img/core-img/placeholder.png" alt=""/> <span style={{textTransform:'capitalize'}}>Hi, {user.name}</span></Link>
+                                <Link onClick = {log} data-toggle="tooltip" data-placement="bottom" title="log out account"><img src="../../img/core-img/message.png" alt=""/> <span>Logout</span></Link>
                             </div>
                         }
                         
@@ -64,12 +129,144 @@ const Header = (props) => {
                 </div>
             </div>
         </div>
+
+        {
+            LenderpendingApprovals != null && LenderpendingApprovals.length > 0 && isRequestSeen == false &&
+            <section className="footer-area section-padding-10-0">
+                <div className="">
+                    <div>
+                        <div style={{padding:20,color:'#fff',textAlign:'center'}}>
+                            You have {LenderpendingApprovals.length} pending Loan request
+                            <button onClick={showpending} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>View Details</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </section>
+        }
+
+        {
+            loantobedisbursed != null && loantobedisbursed.length > 0 && isloantobedisbursed == false &&
+            <section className="footer-area section-padding-10-0">
+                <div className="">
+                    <div>
+                        <div style={{padding:20,color:'#fff',textAlign:'center'}}>
+                            You have {loantobedisbursed.length} undisbursed Loan(s)
+                            <button onClick={showtobedisbursed} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>View Details</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </section>
+        }
+
+
         {
             (userdetails == null ||
             userhomeaddress == null ||
             userofficeaddress == null ||
             usersocialmedia == null ||
             bankdetail == null) && <Notify />
+        }
+
+        {
+            userdetails != null && userhomeaddress != null && userofficeaddress != null && usersocialmedia != null &&
+            bankdetail != null && Object.keys(userdetails).length > 0 && userdetails.Is_phone_number_verified == 0 && isSubmitting == false &&
+            <section className="footer-area section-padding-10-0">
+                <div className="">
+                    <div>
+                        <div style={{padding:20,color:'#fff',textAlign:'center'}}>
+                            Verify your Phone Number 
+                            <button onClick={PhoneVerify} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>Verify Now</button>
+                        </div>
+                    </div>
+                </div>
+    
+            </section>
+        }
+
+
+        {
+             userdetails != null && userhomeaddress != null && userofficeaddress != null && usersocialmedia != null &&
+             bankdetail != null && Object.keys(userdetails).length > 0 && userdetails.Is_email_verified == 0 &&
+             userdetails.Is_phone_number_verified == 1 &&
+            <section className="footer-area section-padding-10-0">
+                <div className="">
+                    <div>
+                        <div style={{padding:20,color:'#fff',textAlign:'center'}}>
+                            A Link was sent to your to email account...Verify your account via to the link
+                            <button hidden={isSubmitting} onClick={SendEmailLink} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>Send Link Again</button>
+                            <Loader
+                                        visible={isSubmitting}
+                                        type="Puff"
+                                        color="#ffbb38"
+                                        height={30}
+                                        width={30}
+                                        timeout= {0} //3 secs
+                                
+                                    />
+                        </div>
+                    </div>
+                </div>
+    
+            </section>
+        }
+
+        {
+            verify_phone == true && 
+            <div className="sideview2" style={{padding:20,backgroundColor:'#f2f4f6'}}>
+                <div>
+                    <a className="pull-right">
+                    <FontAwesomeIcon icon={faTimesCircle} onClick={() => setverify_phone(false)} style={{color:'red',fontSize:25}} />
+                    </a>
+                </div>
+                <div className="" style={{width:'100%'}}>
+                    <div id="" style={{textAlign:'center'}}>
+                       <h3>Verify your Phone Number</h3>
+                       <form onSubmit={handleSubmit(onSubmit)}>
+                        
+                        <div className="row" style={{marginTop:15}}>
+                            <div style={{width:'80%', marginLeft:'10%',marginTop:30}}>                           
+                            <div className="col-lg-12 col-sm-12 col-md-12 col-lg-offset-2">   
+                            <fieldset>
+                            <input
+                                placeholder="Enter Code from Surebanker"
+                                type="text"
+                                className="form-control"
+                                name="code"
+                                tabindex="1" 
+                                autofocus
+                                ref={register({
+                                    required: "Required",
+                                    minLength:3
+                                })}
+                                />
+                                <small className="text-danger">{errors.mobile?.type == "required" && "Mobile is required"}</small>
+                                <small onClick ={SendAgain} className="text-danger">Enter the Code sent to your Phone Number</small>
+                            </fieldset>
+                            </div>
+                            <div className="row">
+                            <div className="col-lg-12 col-sm-12 col-md-12 col-lg-offset-2">
+                            <button hidden={isSubmitting} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5,width:200}} name="submit"  type="submit" id="" data-submit="...Sending">Verify</button>
+                            <Loader
+                                        visible={isSubmitting}
+                                        type="Puff"
+                                        color="#ffbb38"
+                                        height={30}
+                                        width={30}
+                                        timeout= {0} //3 secs
+                                
+                                    />
+                            </div>
+                        </div> 
+                            </div>
+                        </div>
+               
+            </form>
+    
+                    </div>
+                </div>
+            </div>
         }
         
 
@@ -116,9 +313,15 @@ const Header = (props) => {
                                         <Link to="/makerequest">Sure Request</Link>
                                         
                                     </li>
-                                    <li><Link to="/peer">Peer 2 Peer</Link></li>
+                                    <li className="dropdown">
+                                        <Link>Peer 2 Peer</Link>
+                                        <div class="dropdown-content">
+                                            <Link to = "/peer_borrower">Peer Borrower with Lender</Link>
+                                            <Link to ="/peer_lender">Peer Lender with Borrower</Link>
+                                        </div>
+                                    </li>
                                     <li><Link to="/home">My Account</Link></li>
-                                    <li><Link to="/profile">My Profile</Link></li>
+                                    {/* <li><Link to="/profile">My Profile</Link></li> */}
                                 </ul>
                             </div>
                           

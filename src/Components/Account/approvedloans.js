@@ -16,7 +16,7 @@ import Sidebar from './sidebar';
 import {  GetApprovedLoans } from '../redux/action/loan';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import Request from './Request';
+import ApprovedLoanRequest from './ApprovedLoanRequest';
 
 const ApprovedLoans = (props) => 
 {
@@ -27,6 +27,7 @@ const ApprovedLoans = (props) =>
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
     const month = useSelector(state => state.root.month);
+    const type = 'lender';
     
     useEffect(() => {
         process();
@@ -41,8 +42,10 @@ const ApprovedLoans = (props) =>
 
     const requestInformation = (request) => 
     {
-        setrequest(request);
+        //alert(JSON.stringify(request));
         setview_more(true);
+        setrequest(request);
+        
     }
 
     const FormatDate = (date) => {
@@ -57,14 +60,14 @@ const ApprovedLoans = (props) =>
         <section className="lattest-product-area pb-40 category-list">
             <ReactNotification />
                 <div hidden={!view_more} className="sideview">
-                    <div>
+                    <div style={{float:'right'}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_more(false)} style={{color:'red',fontSize:25}} />
                         </a>
                     </div>
                     <div className="">
                         <div id="">
-                        { Object.keys(request).length > 0 && <Request request = {request} />   }
+                        { Object.keys(request).length > 0 && <ApprovedLoanRequest request = {request} type = {type} />   }
                         {/* <Tabs defaultIndex={1} onSelect={index => alert(index)}>
                             <TabList style ={{borderColor:'green'}}>
                             <Tab style={{backgroundColor:'#003679',color:'#fff',borderColor:'#003679', borderTopLeftRadius:7,borderTopRightRadius:7}}>Borrower Profile</Tab>
