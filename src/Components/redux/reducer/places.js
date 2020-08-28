@@ -3,6 +3,7 @@ import {
     STATES,
     PLACES_RESET
 } from '../action/constants';
+import storage from 'redux-persist/lib/storage';
 
 const initialState = {
     countries:[],
@@ -26,6 +27,7 @@ export function PlacesReducer(state = initialState, action)
     }
     if(action.type == PLACES_RESET)
     {
+        storage.removeItem('persist:root');
         return Object.assign({}, state, {
             countries:[],
             states:[],

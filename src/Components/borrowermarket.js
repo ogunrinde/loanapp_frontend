@@ -71,7 +71,7 @@ const BorrowerMarket = (props) =>
                 </div>
             </section>
             <div hidden={!view_profile} className="sideview2">
-                    <div>
+                    <div style={{float:'right', padding:10}}>
                         <a className="pull-right">
                         <FontAwesomeIcon icon={faTimesCircle} onClick={() => setview_profile(false)} style={{color:'red',fontSize:25}} />
                         </a>

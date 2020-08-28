@@ -275,7 +275,7 @@ const MarketPlacedetailsForBorrower = (props) => {
 							<p>Maximum Interest</p>
 						</div>
 						<div className="desc">
-                           {props.request.minInterestRate}%
+                           {props.request.maxInterestRate}%
 						</div>
 					</div>
                     <div className="bio-box">

@@ -59,7 +59,7 @@ const Header = (props) => {
     }
 
     const showtobedisbursed = () => {
-        isloantobedisbursed(true);
+        setisloantobedisbursed(true);
         props.history.push('/home/loantobedisbursed');
     }
 
@@ -339,7 +339,7 @@ const Header = (props) => {
         </div>
         <div class ="mobile">
         <nav class="navbar navbar-expand-lg navbar-light" style={{backgroundColor:'#003679',color:"#fff"}}>
-                        <a class="navbar-brand" href="#" style={{color:'#fff'}}>Navbar</a>
+                        <a class="navbar-brand" href="#" style={{color:'#fff'}}>Surebanker</a>
                         <button style={{backgroundColor:'#ffbb38'}} class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                             <span style={{color:'#fff'}} class="navbar-toggler-icon"></span>
                         </button>

@@ -7,6 +7,7 @@ import {
     OTHERS,
     CREATEVAULT_RESET
 } from '../action/constants';
+import storage from 'redux-persist/lib/storage';
 
 const initialState = {
     fundamount:'',
@@ -75,6 +76,7 @@ export function CreateVaultReducer(state = initialState, action)
     }
     if(action.type == CREATEVAULT_RESET)
     {
+        storage.removeItem('persist:root');
         return Object.assign({}, state, {
             fundamount:'',
             availablefrom:'',
@@ -85,6 +87,7 @@ export function CreateVaultReducer(state = initialState, action)
             maxInterestperMonth:'',
             borrower_country_id:'',
             borrower_state_id:'',
+            borrower_city_id:'',
             email_must_be_verified:'',
             phonenumber_must_be_verified:'',
             bvn_must_be_verified:'',
@@ -95,5 +98,6 @@ export function CreateVaultReducer(state = initialState, action)
     return state;
 
 };
+
 
 //export default RootReducer;

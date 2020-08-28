@@ -132,6 +132,7 @@ ul.tabs li{
   color: #222;
   display: inline-block;
   padding: 10px 15px;
+  text-align: center;
   /* border-right: 1px solid #E2F3FB;
   border-top: 2px solid #E2F3FB; */
   cursor: pointer;
@@ -459,5 +460,27 @@ ul.tabs li.current{
   }
   #request, #Edu-detail, #officeaddress, #vault{
     height: auto;
+  }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  ul.tabs li{
+    color: #222;
+    display: inline-block;
+    padding: 5px 5px;
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  ul.tabs li{
+    color: #222;
+    display: inline-block;
+    padding: 5px 5px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  ul.tabs li{
+    color: #222;
+    display: inline-block;
+    padding: 5px 5px;
   }
 }

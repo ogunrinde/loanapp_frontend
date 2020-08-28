@@ -47,8 +47,10 @@ import {
     CITIES,
     VAULT_CREATED,
     SURECONNECT,
-    PAYMENTANALYTICS
+    PAYMENTANALYTICS,
+    LOGOUT
 } from '../action/constants';
+import storage from 'redux-persist/lib/storage';
 
 const initialState = {
     user:{},
@@ -289,6 +291,7 @@ export function RootReducer(state = initialState, action)
     }
     else if (action.type == MAIN_RESET)
     {
+        storage.removeItem('persist:root');
         return Object.assign({}, state, {
             user:{},
             userId:0,
@@ -334,7 +337,7 @@ export function RootReducer(state = initialState, action)
             cities:[],
             vaultcreated: false,
             sureconnect:{},
-            paymentanalytics:{},
+            paymentanalytics:{}
         });
     }
     else if(action.type == ALL_LENDER_OFFERS)
@@ -415,6 +418,11 @@ export function RootReducer(state = initialState, action)
         return Object.assign({}, state, {
             paymentanalytics: action.payload
         });
+    }
+    else if(action.type == LOGOUT)
+    {
+        storage.removeItem('persist:root');
+        state = undefined;
     }
     else if(action.type == VERIFY_EMAIL)
     {
