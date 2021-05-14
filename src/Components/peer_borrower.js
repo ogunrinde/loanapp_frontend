@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
 import { Link } from 'react-router-dom';
 import Footer from './Footer';
@@ -18,13 +18,16 @@ const PeerBorrower = (props) =>
     const dispatch = useDispatch();
     const IsFetching = useSelector(state => state.root.IsFetching);
     const { handleSubmit, register, errors } = useForm();
-    const onSubmit =  (data) => {
-         dispatch(PeerBorrowerToLender(data,props));
+    const [ IsSubmitting, setIsSubmitting ] = useState(false);
+    const onSubmit =  async (data,e) => {
+         setIsSubmitting(true);
+         await dispatch(PeerBorrowerToLender(data,props,e));
+         setIsSubmitting(false);
     }
     return(
         <div>
             <ReactNotification />
-            <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
+            {/* <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
                 <div class="container h-100">
                     <div class="row h-100 align-items-center">
                         <div class="col-12">
@@ -35,9 +38,9 @@ const PeerBorrower = (props) =>
                         </div>
                     </div>
                 </div>
-            </section>
-            <section>
-            <div className="profilecontainer"> 
+            </section> */}
+            <section  style={{backgroundColor:'#f1f7f9',padding:20,paddingBottom:40}}>
+            <div className="profilecontainer peer "> 
               <div id="contact">
              <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Peer to Peer  {props.totalSteps}</h3>
@@ -166,29 +169,6 @@ const PeerBorrower = (props) =>
                     </fieldset>
                     </div>
                 </div>
-               
-
-                {/* <div className="row">
-                   
-                    <div className="col-lg-12 col-sm-12 col-md-12">
-                        <fieldset>
-                        <select 
-                            name="requiredcreditBereau" 
-                            style={{color:'#777777'}}
-                            placeholder=""
-                            ref={register({
-                                required: "Required"
-                              })}
-                        >
-                            <option value="">Are you will to pay for Credit Bereau</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select> 
-                            <small className="text-danger">{errors.requiredcreditBereau?.type == "required" && "Credit Bereau field is required"}</small>
-                        </fieldset>
-                    </div>
-               
-                </div>                */}
                     <fieldset>
                     <div className="row">
                         <div className="col-lg-6">
@@ -198,10 +178,10 @@ const PeerBorrower = (props) =>
                           
                         </div>
                         <div className="col-lg-3">
-                        <button name="submit" hidden = {IsFetching}  type="submit" id="" data-submit="...Sending">Submit Request</button>
+                        <button name="submit" hidden = {IsSubmitting}  type="submit" id="" data-submit="...Sending">Submit Request</button>
                         <div style={{width:'100%',textAlign:'center'}}>
                         <Loader
-								visible={IsFetching}
+								visible={IsSubmitting}
 								type="Puff"
 								color="#ffbb38"
 								height={30}

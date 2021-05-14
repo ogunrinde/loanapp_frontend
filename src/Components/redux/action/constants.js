@@ -6,6 +6,7 @@ const SURE_REQUEST = 'SURE_REQUEST';
 const FETCHING = 'FETCHING';
 const VAULT = "VAULTING";
 const PATH = "http://localhost:8000/api/";
+//const IMAGEPATH = "http://localhost/surebankermoney/public";
 //const PATH = 'http://surebanker.online/surebanker/api/';
 const MESSAGE = 'MESSAGE';
 const REQUEST_STATUS = 'REQUEST_STATUS';
@@ -64,6 +65,14 @@ const VAULT_CREATED  = 'VAULT_CREATED';
 const SURECONNECT = 'SURECONNECT';
 const PAYMENTANALYTICS = 'PAYMENTANALYTICS';
 const LOGOUT = 'LOGOUT';
+const SUCCESSCOLOR = 'green';
+const ERRORCOLOR = 'red';
+const BANKS = 'BANKS';
+const PAYSTACK_APIKEY = 'pk_test_20f82f24ab9e053d65cc58c7fabdc72c90fee340';
+const CREDIT_REGISTRY_LOGIN = 'CREDIT_REGISTRY_LOGIN';
+const CREDIT_REGISTRY_REPORT = 'CREDIT_REGISTRY_REPORT';
+const WITHDRAWFROMREPAYMENT = 'WITHDRAWFROMREPAYMENT';
+const IMAGEPATH = "http://localhost:8000/files/";
 
 
 const INSTANCE = axios.create({
@@ -152,5 +161,13 @@ export
     VAULT_CREATED,
     SURECONNECT,
     PAYMENTANALYTICS,
-    LOGOUT
+    LOGOUT,
+    SUCCESSCOLOR,
+    ERRORCOLOR,
+    BANKS,
+    PAYSTACK_APIKEY,
+    CREDIT_REGISTRY_LOGIN,
+    CREDIT_REGISTRY_REPORT,
+    WITHDRAWFROMREPAYMENT,
+    IMAGEPATH
 };

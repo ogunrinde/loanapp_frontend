@@ -25,13 +25,14 @@ const LoanTenor = (props) => {
               <form onSubmit={handleSubmit(onSubmit)}>
               <h3>Loan Request Conditions</h3>
                 <span>Complete the Information Below</span>
-                <div className="row" style={{marginTop:20,marginBottom:20}}>
+                <div className="row" style={{marginTop:20,marginBottom:10}}>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                    <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Loan Tenor (in Months)</p>    
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Minimum Loan Tenor (in Months)</label>    
                     <fieldset>
                        <input 
                             type="number" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="minloantenor"
                             ref={register({
@@ -42,11 +43,12 @@ const LoanTenor = (props) => {
                     </fieldset>
                     </div>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Loan Tenor (in Months)</p>  
+                        <label style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Loan Tenor (in Months)</label>  
                         <fieldset>    
                         <input 
                             type="number" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="maxloantenor"
                             ref={register({

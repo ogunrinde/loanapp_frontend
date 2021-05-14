@@ -158,8 +158,20 @@ fieldset {
   margin: 0 0 5px;
   padding: 10px;
   font-size: 15px;
-}
 
+}
+.profilea {
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: #ffbb38;
+  color: #FFF;
+  margin: 0 0 5px;
+  padding: 10px;
+  font-size: 15px;
+  text-align: center;
+  border-radius: 7px;
+}
 
 #contact button[type="submit"]:hover {
   background: #003679;
@@ -255,7 +267,7 @@ select option {
     width:100% !important;
   }
   #contact {
-    padding: 2px;
+    padding: 20px;
   }
   .viewdetail{
     margin-top: 10px !important;
@@ -265,5 +277,11 @@ select option {
   }
   .content{
     margin-left: -20px;
+  }
+  .pcode{
+    width: 30% !important;
+  }
+  .pnum{
+    width: 70% !important;
   }
 }

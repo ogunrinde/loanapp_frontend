@@ -34,6 +34,9 @@ const MakeRequest = (props) =>
     const [meetrequirement, setmeetrequirement] = useState([]);
     const [isLoadingCities, setisLoadingCities] = useState(false);
     const cities = useSelector(state => state.root.cities);
+    const [ IsSubmittingRequest, setIsSubmittingRequest ] = useState(false);
+    const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
+    const route = useSelector(state => state.root.route);
     
     const { handleSubmit, register, errors } = useForm();
     
@@ -41,14 +44,15 @@ const MakeRequest = (props) =>
     useEffect(() =>{
         process();
         getalloffers();
+        //alert(JSON.stringify(userdetails));
         //days('2020-08-14','2020-08-31');
     },[]);
 
     const days = (from,to) => {
         const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-        let fromyear = from.split('-')[0];
-        let frommonth = from.split('-')[1];
-        let fromday = from.split('-')[2];
+        let fromyear = new Date().getFullYear(); //from.split('-')[0];
+        let frommonth = new Date().getMonth() + 1;// from.split('-')[1];
+        let fromday = new Date().getDate();// from.split('-')[2];
 
         let toyear = to.split('-')[0];
         let tomonth = to.split('-')[1];
@@ -78,7 +82,9 @@ const MakeRequest = (props) =>
     const onSubmit = async (data) =>
     { 
         //alert(JSON.stringify(data));
+        setIsSubmittingRequest(true);
         await dispatch(SendRequest(data,props,meetrequirement));
+        setIsSubmittingRequest(false);
         
     }
 
@@ -108,6 +114,7 @@ const MakeRequest = (props) =>
                 return parseFloat(event.target.value) >= parseFloat(offer.minRequestAmount) &&
                        parseFloat(event.target.value) <= parseFloat(offer.maxRequestAmount)
             });
+            //alert(JSON.stringify(all_lender_offers));
         } 
         if(event.target.name == 'maxInterestRate')
         {
@@ -118,7 +125,8 @@ const MakeRequest = (props) =>
         if(event.target.name == 'loanperiod')
         {
             requirement = requirement.filter(function (offer) {
-                let offerdays = days(offer.availablefrom,offer.availableto);
+                let offerdays = offer.maxloantenor * 30;
+                //let offerdays = days(offer.availablefrom,offer.availableto);
                 let loandays = parseFloat(event.target.value) * 30;
                 return offerdays >= loandays
             });
@@ -155,7 +163,7 @@ const MakeRequest = (props) =>
     return(
         <div>
             <ReactNotification />
-            <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
+            {/* <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
                 <div class="container h-100">
                     <div class="row h-100 align-items-center">
                         <div class="col-12">
@@ -166,14 +174,14 @@ const MakeRequest = (props) =>
                         </div>
                     </div>
                 </div>
-            </section>
+            </section > */}
             <section style={{backgroundColor:'#f1f7f9',padding:20,paddingBottom:40}}>
-            <div className="profilecontainer"> 
+            <div className="profilecontainer peer"> 
               <div id="contact"> 
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
                     <div className ="col-lg-7 col-sm-12 col-md-7">
-                       <h3>Sure Request  {props.totalSteps}</h3>
+                       <h3>Request for a Loan  {props.totalSteps}</h3>
                        <h4>Complete the Form Below</h4>
                     </div>
                     <div className ="col-lg-5 col-sm-12 col-md-5">
@@ -311,20 +319,20 @@ const MakeRequest = (props) =>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                             <select 
-                                    name="lender_country_id"
+                                    name="borrower_country_id"
                                     style={{color:'#777777'}}
                                     onChange = {(text) => handleChange(text)}
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Select Lender's Country</option>
+                                <option value ="">Select Borrower's Country</option>
                                     {
                                         countries.map((country) =>
                                         <option value ={country.id}>{ country.name }</option>
                                     )}
                             </select> 
-                            <small className="text-danger">{errors.lender_country_id?.type == "required" && "Country is required"}</small>
+                            <small className="text-danger">{errors.borrower_country_id?.type == "required" && "Country is required"}</small>
                             { isLoadingCountries == true && <small className="text-danger">Loading Countries....</small>}
                         </fieldset>
                     </div>
@@ -335,40 +343,40 @@ const MakeRequest = (props) =>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                                 <select 
-                                    name="lender_state_id"
+                                    name="borrower_state_id"
                                     onChange = {(text) => handleState(text)}
                                     style={{color:'#777777'}}    
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Select Lender's State</option>
+                                <option value ="">Select Borrower's State</option>
                                     {
                                         states.map((state) =>
                                         <option value ={state.id}>{ state.name }</option>
                                     )}
                             </select> 
-                            <small className="text-danger">{errors.lender_state_id?.type == "required" && "State is required"}</small>
+                            <small className="text-danger">{errors.borrower_state_id?.type == "required" && "State is required"}</small>
                             { isLoadingState == true && <small className="text-danger">Loading States....</small>}
                         </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                             <select 
-                                    name="lender_city_id"
+                                    name="borrower_city_id"
                                     style={{color:'#777777'}}
                                     onChange = {handleInput}
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Select Lender's City</option>
+                                <option value ="">Select Borrower's City</option>
                                     {
                                         cities.map((city) =>
                                         <option value ={city.id}>{ city.name }</option>
                                     )}
                             </select> 
-                            <small className="text-danger">{errors.lender_city_id?.type == "required" && "City is required"}</small>
+                            <small className="text-danger">{errors.borrower_city_id?.type == "required" && "City is required"}</small>
                             { isLoadingCities == true && <small className="text-danger">Loading Cities....</small>}
                         </fieldset>
                     </div>
@@ -386,16 +394,12 @@ const MakeRequest = (props) =>
                         </div>
                         <div className="col-lg-3">
                             {
-                                (userdetails != null ||
-                                userhomeaddress != null ||
-                                userofficeaddress != null ||
-                                usersocialmedia != null ||
-                                bankdetail != null || userdetails.Is_phone_number_verified != 0   || userdetails.Is_email_verified != 0) &&
-                                <button name="submit" hidden = {IsFetching}  type="submit" id="" data-submit="...Sending">Submit Request</button>
+                                 
+                                <button name="submit" hidden = {IsSubmittingRequest}  type="submit" id="" data-submit="...Sending">Submit Request</button>
                             }      
                             <div style={{width:'100%',textAlign:'center'}}>
                             <Loader
-								visible={IsFetching}
+								visible={IsSubmittingRequest}
 								type="Puff"
 								color="#ffbb38"
 								height={30}

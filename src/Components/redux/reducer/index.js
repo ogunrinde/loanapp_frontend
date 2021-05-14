@@ -48,9 +48,14 @@ import {
     VAULT_CREATED,
     SURECONNECT,
     PAYMENTANALYTICS,
-    LOGOUT
+    LOGOUT,
+    BANKS,
+    CREDIT_REGISTRY_LOGIN,
+    CREDIT_REGISTRY_REPORT,
+    WITHDRAWFROMREPAYMENT
 } from '../action/constants';
 import storage from 'redux-persist/lib/storage';
+import { act } from 'react-dom/test-utils';
 
 const initialState = {
     user:{},
@@ -98,6 +103,11 @@ const initialState = {
     vaultcreated: false,
     sureconnect:{},
     paymentanalytics:{},
+    banks : [],
+    credit_registry_login:{},
+    credit_registry_report:{},
+    withdrawfromrepayments:[],
+    route: '',
     month: ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 };
@@ -108,8 +118,13 @@ export function RootReducer(state = initialState, action)
         return Object.assign({}, state, {
             user: action.payload.user,
             IsLoggedIn:true,
-            token:action.payload.access_token
-
+            token:action.payload.access_token,
+            route: action.payload.route,
+            userHomeAddress:action.payload.userinformation.userhome,
+            userbasicdetails:action.payload.userinformation.userdetails,
+            userOfficeAddress:action.payload.userinformation.useroffice,
+            userSocialMediaAccounts:action.payload.userinformation.socialmedia,
+            userBankInformation:action.payload.userinformation.bankinfo
         });
     }
     else if(action.type === USER_REGISTER){
@@ -153,8 +168,9 @@ export function RootReducer(state = initialState, action)
     else if(action.type == USEROFFICEADDRESS)
     {
         return Object.assign({}, state, {
-            userOfficeAddress: action.payload.userOfficeAddress,
+            userOfficeAddress: action.payload.UserOfficeAddress,
             nextphase:3
+            
         });
     }
     else if(action.type == USERMEDIAACCOUNT)
@@ -241,10 +257,12 @@ export function RootReducer(state = initialState, action)
     else if(action.type == COMPLETEUSERPROFILE)
     {
         return Object.assign({}, state, {
-            userbasicdetails: action.payload.userdetails,
-            userHomeAddress: action.payload.homeaddress,
-            userOfficeAddress:action.payload.officeaddress,
-            userSocialMediaAccounts:action.payload.socialmedia
+            route: action.payload.route,
+            userHomeAddress:action.payload.userinformation.userhome,
+            userbasicdetails:action.payload.userinformation.userdetails,
+            userOfficeAddress:action.payload.userinformation.useroffice,
+            userSocialMediaAccounts:action.payload.userinformation.socialmedia,
+            userBankInformation:action.payload.userinformation.bankinfo            
         });
     }
     else if(action.type == NEXTPHASE)
@@ -291,7 +309,7 @@ export function RootReducer(state = initialState, action)
     }
     else if (action.type == MAIN_RESET)
     {
-        storage.removeItem('persist:root');
+        storage.removeItem('persist:loanapp');
         return Object.assign({}, state, {
             user:{},
             userId:0,
@@ -423,6 +441,30 @@ export function RootReducer(state = initialState, action)
     {
         storage.removeItem('persist:root');
         state = undefined;
+    }
+    else if(action.type == BANKS)
+    {
+        return Object.assign({}, state, {
+            banks: action.payload.banks
+        });
+    }
+    else if(action.type == CREDIT_REGISTRY_LOGIN)
+    {
+        return Object.assign({}, state, {
+            credit_registry_login: action.payload
+        });
+    }
+    else if(action.type == CREDIT_REGISTRY_REPORT)
+    {
+        return Object.assign({}, state, {
+            credit_registry_report: action.payload
+        });
+    }
+    else if(action.type == WITHDRAWFROMREPAYMENT)
+    {
+        return Object.assign({}, state, {
+            withdrawfromrepayments: action.payload.repayments
+        });
     }
     else if(action.type == VERIFY_EMAIL)
     {

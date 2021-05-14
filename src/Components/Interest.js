@@ -24,13 +24,14 @@ const Interest = (props) => {
         <form onSubmit={handleSubmit(onSubmit)}>
         <h3>Loan Request Conditions</h3>
             <span>Complete the Information Below</span>
-            <div className="row" style={{marginTop:20,marginBottom:20}}>
+            <div className="row" style={{marginTop:20,marginBottom:10}}>
             <div className="col-lg-12 col-sm-12 col-md-12">
-            <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Interest Rate per Month</p>    
+            <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Minimum Interest Rate per Month</label>    
             <fieldset>   
             <input 
                     type="text" 
                     tabindex="1" 
+                    style={{color:'#777777'}}
                     autofocus
                     name="minInterestperMonth"
                     ref={register({
@@ -41,11 +42,12 @@ const Interest = (props) => {
             </fieldset>
             </div>
             <div className="col-lg-12 col-sm-12 col-md-12">
-            <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Interest Rate per Month</p>        
+            <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Maximum Interest Rate per Month</label>        
             <fieldset> 
             <input  
                     type="text" 
                     tabindex="1" 
+                    style={{color:'#777777'}}
                     autofocus
                     name="maxInterestperMonth"
                     ref={register({

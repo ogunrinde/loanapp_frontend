@@ -27,6 +27,7 @@ const LenderMarket = (props) =>
     const [IsFetching, setIsFetching ] = useState(false);
     const all_lender_offers = useSelector(state => state.root.all_lender_offers);
     const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
+    const route = useSelector(state => state.root.route);
 
     // const connect = (lenderId, requestId, vaultId) => {
     //     setview_vault(true);
@@ -46,6 +47,7 @@ const LenderMarket = (props) =>
 
     const ViewlenderProfile = (offer) => {
         //alert(IsLoggedIn);
+        //alert(JSON.stringify(offer));
         if(IsLoggedIn == false)
         {
             props.history.push('/login');
@@ -91,16 +93,17 @@ const LenderMarket = (props) =>
               <div id="contact">
               <div className="list-group">
                   {
+                      IsFetching == false &&
                       all_lender_offers.length > 0 &&
                       all_lender_offers.map((offer) => 
-                        <div class="list-group-item list-group-item-action disabled">
+                        <div class="list-group-item list-group-item-action disabled marketlist">
                             <div className="row">
-                                <div className="col-lg-2 col-sm-2 col-md-2 col-4">
+                                <div className="col-lg-3 col-sm-3 col-md-3 col-4" style={{marginRight:10}}>
                                    <div className="news-thumbnail">
                                      <img src="img/bg-img/7.jpg" alt=""/>
                                     </div>
                                 </div>    
-                                <div className="col-lg-7 col-sm-7 col-md-7 col-8 content">
+                                <div className="col-lg-5 col-sm-5 col-md-5 col-8 content">
                                     <div className="news-content">
                                         <p style={{textTransform:'capitalize'}}>{offer.user.name}</p>
                                         <p style={{fontSize:14}}>NGN {offer.fundamount.toLocaleString()}</p>
@@ -113,9 +116,13 @@ const LenderMarket = (props) =>
                                     
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-12 col-md-3">
+                                <div className="col-lg-4 col-sm-12 col-md-3">
                                        <div style ={{textAlign:'right'}}>
-                                       <button  name="submit" style={{padding:4}} className="viewdetail" onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
+                                        {
+                                            IsLoggedIn == true && route == '' &&
+                                            <button  name="submit" style={{padding:4}} className="viewdetail" onClick ={() => ViewlenderProfile(offer)} type="submit"   id="" data-submit="...Sending">View Details</button>
+
+                                        }
 
                                        </div>
 

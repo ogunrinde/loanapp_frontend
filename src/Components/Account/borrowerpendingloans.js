@@ -73,6 +73,7 @@ const BorrowerPendingRequest = (props) =>
                             <tr className="filter-bar" style={{color:'#fff'}}>
                                 <th scope="col">S/N</th>
                                 <th scope="col">Lender Name</th>
+                                <th scope="col">Request Amount</th>
                                 <th scope="col">Repayment Plan</th>
                                 <th scope="col">Loan Period (In months)</th>
                                 <th scope="col">Request Date</th>
@@ -86,6 +87,7 @@ const BorrowerPendingRequest = (props) =>
                                 <td>
                                     {id+1}
                                 </td>
+                               
                                 <td>
                                     <div className="media">
                                     
@@ -95,16 +97,33 @@ const BorrowerPendingRequest = (props) =>
                                     </div>
                                 </td>
                                 <td>
+                                    <div className="media">
+                                    
+                                        <div className="media-body">
+                                            {request.request.requestAmount}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
                                     {request.request.repaymentplan}
                                 </td>
                                 <td>
-                                    {request.request.loanperiod}
+                                    {request.request.loanperiod} month(s)
                                 </td>
                                 <td>
                                     {FormatDate(request.request.created_at)}
                                 </td>
                                 <td>
-                                    <button onClick = {() => requestInformation(request)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>View Profile</button>
+                                    {
+                                        request.connection_type == 'lender connect' &&
+                                        <button onClick = {() => requestInformation(request)} style={{padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>View Profile</button>
+
+                                    }
+                                    {
+                                        request.connection_type == null &&
+                                        'Waiting for Lender to Approve'
+
+                                    }
                                 
                                 </td>
                             </tr>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/account/main.css';
 import '../css/account/util.css';
 import { Link, useLocation, useHistory } from 'react-router-dom';
@@ -16,6 +16,7 @@ const Login = (props) =>
 {
 	const user = useSelector(state => state.root.user);
 	const IsFetching = useSelector(state => state.root.IsFetching);
+	const [ IsSubmitting, setIsSubmitting ] = useState(false);
 	const dispatch = useDispatch();
 	const { handleSubmit, register, errors } = useForm();
 	let history = useHistory();
@@ -23,7 +24,9 @@ const Login = (props) =>
 
     let { from } = location.state || { from: { pathname: "/" } };
 	const onSubmit = async data => {
-		await dispatch(user_attempt_login(data,history,from));
+		setIsSubmitting(true);
+		await dispatch(user_attempt_login(data,history,from, props));
+		setIsSubmitting(false);
 		//if(Object.keys(user).length > 0) history.replace(from);
 	}
 
@@ -91,11 +94,11 @@ const Login = (props) =>
 			
 
 					<div className="container-login100-form-btn">
-						<button hidden = {IsFetching} type="submit" className="login100-form-btn">
+						<button hidden = {IsSubmitting} type="submit" className="login100-form-btn">
 							Login
 						</button>
 						<Loader
-								visible={IsFetching}
+								visible={IsSubmitting}
 								type="Puff"
 								color="#ffbb38"
 								height={30}

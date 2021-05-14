@@ -21,13 +21,16 @@ const Register = (props) =>
 	const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
 	const IsAccountCreated = useSelector(state => state.root.IsAccountCreated);
 	const IsFetching = useSelector(state => state.root.IsFetching);
+	const [ IsSubmittingRegister, setIsSubmittingRegister ] = useState(false);
 	const user = useSelector(state => state.root.user);
 	const dispatch = useDispatch();
 	const [ isSubmitting, setisSubmitting] = useState(false);
     const { register, handleSubmit, watch, errors } = useForm();
     const onSubmit = async (data,e) => {
+		setIsSubmittingRegister(true);
 		await dispatch(user_attempt_register(data,props));
 		e.target.reset();
+		setIsSubmittingRegister(false);
 	}
 	useEffect(()=>{
 		reset();
@@ -114,11 +117,11 @@ const Register = (props) =>
 			
 
 					<div className="container-login100-form-btn">
-						<button hidden={IsFetching} type="submit" className="login100-form-btn">
+						<button hidden={IsSubmittingRegister} type="submit" className="login100-form-btn">
 							Create Account 
 						</button>
 						<Loader
-								visible={IsFetching}
+								visible={IsSubmittingRegister}
 								type="Puff"
 								color="#ffbb38"
 								height={30}

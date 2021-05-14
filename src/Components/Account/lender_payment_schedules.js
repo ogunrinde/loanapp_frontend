@@ -58,7 +58,7 @@ const LenderPaymentSchedules = (props) => {
                     <div className="col-lg-3 col-md-6 col-sm-6">
                         <div className="single-features">
                             <div className="f-icon">
-                            <h3>{analytics.paid != undefined ? analytics.paid : 0}</h3>
+                            <h3>NGN {analytics.paid != undefined ? analytics.paid : 0}</h3>
                             </div>
                             <h6>Total Paid</h6>
                         </div>
@@ -89,7 +89,7 @@ const LenderPaymentSchedules = (props) => {
                             <tr className="filter-bar" style={{color:'#fff'}}>
                                 <th className="text-center" scope="col">S/N</th>
                                 <th className="text-center" scope="col">Borrower Name</th>
-                                <th className="text-center" scope="col">Expected Amount to Paid</th>
+                                <th className="text-center" scope="col">Expected Amount to Paid (NGN)</th>
                                 <th className="text-center" scope="col">Due date</th>
                                 <th className="text-center" scope="col">Status</th>
                             </tr>
@@ -121,7 +121,7 @@ const LenderPaymentSchedules = (props) => {
                                     }
 
                                     {
-                                        request.status == 'paid' && <div style={{textTransform:'capitalize',color:'green', borderWidth:5,border :'1px solid orange',borderRadius:5}}>{request.status}</div>
+                                        request.status == 'Paid' && <div style={{textTransform:'capitalize',color:'green', borderWidth:5,border :'1px solid green',borderRadius:5}}>{request.status}</div>
                                     }
                                 </td>
                                

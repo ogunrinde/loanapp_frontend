@@ -6,7 +6,6 @@ import {
     APPROVEDLOANS,
     DISBURSEDLOANS,
     PATH
-
 } from './constants';
 import { Success, Error } from '../../Message/message';
 import axios from 'axios';
@@ -53,7 +52,7 @@ export function GetpendingApprovals()
         });
         return AUTH.get(`getLenderpendingloanapprovals`)
         .then(async (response) => {
-            console.log(response.data);
+            //console.log(response.data);
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: PENDINGAPPROVALS, payload: response.data})
@@ -61,10 +60,10 @@ export function GetpendingApprovals()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            alert(JSON.stringify(err.response));
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            //alert(JSON.stringify(err.response));
+            //if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
             //else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
             //else Error('Failed Attempt',err.message);
 
@@ -94,11 +93,11 @@ export function GetDisbursedLoans()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -127,11 +126,11 @@ export function GetRejectedLoanRequest()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -160,11 +159,11 @@ export function GetApprovedLoans()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }

@@ -37,6 +37,7 @@ const Verification = (props) =>
     
     useEffect(() => {
         process();
+        //alert(JSON.stringify(userdetails));
     },[]);
 
     const process = async  () =>
@@ -62,6 +63,8 @@ const Verification = (props) =>
                     </div>
                    
                 </div>
+                {
+                 userdetails != null && Object.keys(userdetails).length > 0 &&   
 				<div className="table-responsive ">
                     <table className="table">
                         <thead>
@@ -74,26 +77,28 @@ const Verification = (props) =>
                             </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>1</td>
+                            {
+                                userdetails != null && 
+                                <tr>
+                                <td>1</td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            {userdetails.mobile1}
+                                            {userdetails != null && Object.keys(userdetails).length > 0 && userdetails.mobile1}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    {userdetails.Is_phone_number_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
+                                    {userdetails != null && Object.keys(userdetails).length > 0 && userdetails.Is_phone_number_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
                                 </td>
                                 <td>
-                                  {userdetails.date_phone_number_verified == null ? 'Not Verified Yet' : userdetails.date_phone_number_verified }
+                                  {userdetails != null && Object.keys(userdetails).length > 0 && userdetails.date_phone_number_verified == null ? 'Not Verified Yet' : userdetails.date_phone_number_verified }
                                 </td>
                                
                                 <td>
                                     {
-                                        userdetails.Is_phone_number_verified == 0 ? (
+                                        userdetails != null && Object.keys(userdetails).length > 0 && userdetails.Is_phone_number_verified == 0 ? (
                                             <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
                                         ) : (
                                             'Verified'
@@ -102,93 +107,112 @@ const Verification = (props) =>
                                     
                                 
                                 </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
+                                </tr>
+                          }
+                          {
+                              userdetails != null &&
+                                <tr>
+                                    <td>2</td>
+                                        <td>
+                                            <div className="media">
+                                            
+                                                <div className="media-body">
+                                                    {userdetails != null && Object.keys(userdetails).length > 0 && userdetails.email}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {userdetails != null && Object.keys(userdetails).length > 0 && userdetails.Is_email_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
+                                        </td>
+                                        <td>
+                                        {userdetails != null && Object.keys(userdetails).length > 0 &&  userdetails.date_email_verified == null ? 'Not Verified Yet' : userdetails.date_email_verified }
+                                        </td>
+                                    
+                                        <td>
+                                            {
+                                            userdetails != null && Object.keys(userdetails).length > 0 &&  userdetails.Is_email_verified == 0 ? (
+                                                    <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
+                                                ) : (
+                                                    'Verified'
+                                                )
+                                            }
+                                        </td>
+                                </tr>
+                            }
+                            {
+                                userhomeaddress != null &&
+                                <tr>     
+                                <td>3</td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            {userdetails.email}
+                                            {userhomeaddress != null && Object.keys(userhomeaddress).length > 0 && userhomeaddress.address}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    {userdetails.Is_email_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
+                                    {userhomeaddress != null && Object.keys(userhomeaddress).length > 0 && userhomeaddress.is_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
                                 </td>
                                 <td>
-                                  {userdetails.date_email_verified == null ? 'Not Verified Yet' : userdetails.date_email_verified }
+                                    {userhomeaddress != null && Object.keys(userhomeaddress).length > 0 && userhomeaddress.date_home_address_verified == null ? 'Not Verified Yet' : userofficeaddress.date_home_address_verified }
                                 </td>
-                               
+                                
                                 <td>
-                                    {
-                                        userdetails.Is_email_verified == 0 ? (
-                                            <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
-                                        ) : (
-                                            'Verified'
-                                        )
-                                    }
-                                </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                                <td>
-                                    <div className="media">
-                                    
-                                        <div className="media-body">
-                                            {userhomeaddress.address}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    {userhomeaddress.is_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
-                                </td>
-                                <td>
-                                  {userhomeaddress.date_home_address_verified == null ? 'Not Verified Yet' : userofficeaddress.date_home_address_verified }
-                                </td>
-                               
-                                <td>
-                                    {
-                                        userhomeaddress.is_verified == 0 ? (
-                                            <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
-                                        ) : (
-                                            'Verified'
-                                        )
-                                    }
-                                </td>
-                        </tr>
-                        <tr>
+                                        {
+                                            userhomeaddress != null && Object.keys(userhomeaddress).length > 0 && userhomeaddress.is_verified == 0 ? (
+                                                <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
+                                            ) : (
+                                                'Verified'
+                                            )
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            
+                       
+                        {
+                            userofficeaddress != null &&
+                            <tr>
                             <td>4</td>
                                 <td>
                                     <div className="media">
                                     
                                         <div className="media-body">
-                                            {userofficeaddress.address}
+                                            {userofficeaddress != null && userofficeaddress.address}
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    {userofficeaddress.is_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
+                                    {userofficeaddress != null && userofficeaddress.is_verified == 0 ? <FontAwesomeIcon style={{color:'#ff6c00',fontSize:18}} icon={faTimesCircle}/> : <FontAwesomeIcon style={{color:'#ffba00',fontSize:18}} icon={faTimesCircle} />}
                                 </td>
                                 <td>
-                                  {userofficeaddress.date_office_address_verified == null ? 'Not Verified Yet' : userofficeaddress.date_office_address_verified }
+                                  {(userofficeaddress != null && userofficeaddress.date_office_address_verified == null) ? 'Not Verified Yet' : userofficeaddress.date_office_address_verified }
                                 </td>
                                
                                 <td>
                                     {
-                                        userofficeaddress.is_verified == 0 ? (
+                                        userofficeaddress != null && userofficeaddress.is_verified == 0 ? (
                                             <button style={{fontSize:13,padding:3,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:2}}>Verify Now</button>
                                         ) : (
                                             'Verified'
                                         )
                                     }
                                 </td>
-                        </tr>
+                            </tr>
+                        }
+                        
                         </tbody>   
                        
 				    </table>
                    
                 </div>
+                
+                }
+                {
+                    userdetails != null && Object.keys(userdetails).length == 0 &&
+                    <div style={{textAlign:'center', marginTop:20,width:'100%'}}>No Data Found</div>
+                }
                 <div style={{textAlign:'center',marginTop:100}}>
                     <Loader
                         visible={false}

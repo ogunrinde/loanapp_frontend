@@ -13,19 +13,19 @@ const initialState = {
 
 export function PlacesReducer(state = initialState, action)
 {
-    if(action.type == COUNTRIES)
+    if(action.type === COUNTRIES)
     {
         return Object.assign({}, state, {
             countries: action.payload.countries
         });
     }
-    if(action.type == STATES)
+    if(action.type === STATES)
     {
         return Object.assign({}, state, {
             states: action.payload.states
         });
     }
-    if(action.type == PLACES_RESET)
+    if(action.type === PLACES_RESET)
     {
         storage.removeItem('persist:root');
         return Object.assign({}, state, {

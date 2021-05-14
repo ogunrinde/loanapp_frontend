@@ -72,6 +72,7 @@ const ViewProfile = (props) => {
 
     const connectLender = async () => {
 		setIsConnecting(true);
+		//alert(`${props.lenderId}--${props.vaultId}--${props.requestId}`);
         await dispatch(ConnectwithLender(props.lenderId,props.vaultId,props.requestId));
         setIsConnecting(false);
     }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => 
 {
@@ -113,11 +114,9 @@ const Footer = () =>
                     <div className="col-12">
                         <div className="copywrite-content d-flex flex-wrap justify-content-between align-items-center">
                          
-                            <a href="index.html" className="footer-logo"><img src="img/core-img/logo.png" alt=""/></a>
-                            <p className="copywrite-text"><a href="#">Copyright &copy;<script>document.write(new Date().getFullYear());</script>
-                             All rights reserved | This template is made with <i className="fa fa-heart-o" aria-hidden="true"></i> by 
-                            <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                            </a></p>
+                            <Link to="/" className="footer-logo"><img src="img/core-img/logo.png" alt=""/></Link>
+                            <p className="copywrite-text"><Link to="/">Copyright &copy;<script>document.write(new Date().getFullYear());</script>
+                            Surebanker</Link></p>
                         </div>
                     </div>
                 </div>

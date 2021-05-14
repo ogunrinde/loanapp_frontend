@@ -26,13 +26,14 @@ const RequestAmount = (props) => {
               <form onSubmit={handleSubmit(onSubmit)}>
               <h3>Create Vault</h3>
                 <span>Complete the Information Below</span>
-                <div className="row" style={{marginTop:20,marginBottom:20}}>
+                <div className="row" style={{marginTop:20,marginBottom:10}}>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                    <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Maximum Request Amount</p>    
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Maximum Request Amount</label>    
                     <fieldset>
                        <input 
                             type="number" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="maxRequestAmount"
                             ref={register({
@@ -43,11 +44,12 @@ const RequestAmount = (props) => {
                     </fieldset>
                     </div>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Minimum Request Amount</p>  
+                        <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Minimum Request Amount</label>  
                         <fieldset>    
                         <input 
                             type="number" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="minRequestAmount"
                             ref={register({

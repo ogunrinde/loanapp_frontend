@@ -20,11 +20,15 @@ const Borrower = (props) => {
     const cities = useSelector(state => state.root.cities);
     const vaultcreated = useSelector(state => state.root.vaultcreated);
 
+    useEffect(() =>{
+        
+    },[])
+
     const onSubmit = async (data, e) => {
         //alert(JSON.stringify(data));
         await dispatch(Createvault_borrower(data));
-        await dispatch(MakeAvailable());
-        if(vaultcreated == true) window.location.reload();
+        await dispatch(MakeAvailable(props));
+        //if(vaultcreated == true) window.location.reload();
         //alert(vaultcreated);
         //props.nextStep();
         //e.target.reset();
@@ -51,9 +55,9 @@ const Borrower = (props) => {
     <form onSubmit={handleSubmit(onSubmit)}>
     <h3>Preferred Borrower's Profile</h3>
         <span>Complete the Information Below</span>
-        <div className="row" style={{marginTop:20,marginBottom:20}}>
+        <div className="row" style={{marginTop:20,marginBottom:10}}>
         <div className="col-lg-12 col-sm-12 col-md-12">
-        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's Country</p>    
+        <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Borrower's Country</label>    
         <fieldset>
         <select 
                 name="borrower_country_id"
@@ -74,7 +78,7 @@ const Borrower = (props) => {
         </fieldset>
         </div>
         <div className="col-lg-12 col-sm-12 col-md-12">
-        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's State</p>        
+        <label style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's State</label>        
         <fieldset>
         <select 
             name="borrower_state_id" 
@@ -96,7 +100,7 @@ const Borrower = (props) => {
         </fieldset>
         </div>
         <div className="col-lg-12 col-sm-12 col-md-12">
-        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Borrower's City</p>        
+        <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Borrower's City</label>        
         <fieldset>
         <select 
             name="borrower_city_id" 
@@ -119,8 +123,8 @@ const Borrower = (props) => {
      
       </div>
       <div className="row" style={{marginTop:20}}>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont" style={{color:'#777777'}}>Email Must be Verified
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont" style={{color:'#777777', fontSize:14}}>Email Must be Verified
             <input type="checkbox" 
                     name = "email_must_be_verified"
                     ref={register()}
@@ -128,8 +132,8 @@ const Borrower = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont" style={{color:'#777777'}}>Phone Number Must be Verified
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont" style={{color:'#777777',fontSize:14}}>Phone Number Must be Verified
             <input type="checkbox" 
                     name = "phonenumber_must_be_verified"
                     ref={register()}
@@ -137,8 +141,8 @@ const Borrower = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont"  style={{color:'#777777'}}>BVN must be Verified
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont"  style={{color:'#777777',fontSize:14}}>BVN must be Verified
             <input type="checkbox" 
                     name = "bvn_must_be_verified"
                     ref={register()}
@@ -146,6 +150,16 @@ const Borrower = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont"  style={{color:'#777777',fontSize:14}}>CreditBureau Report Required
+            <input type="checkbox" 
+                    name = "creditbureau_report_required"
+                    ref={register()}
+            />
+            <span class="checkmark"></span>
+        </label>
+        </div>
+     
       </div>
       <fieldset>
       <div className="row" style={{marginTop:30}}>

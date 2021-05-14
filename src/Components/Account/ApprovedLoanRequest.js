@@ -9,6 +9,7 @@ import 'react-notifications-component/dist/theme.css';
 import { store } from 'react-notifications-component';
 import { useForm } from 'react-hook-form';
 import '../../css/css/profile.css';
+import { IMAGEPATH } from '../redux/action/constants';
 
 const ApprovedLoanRequest = (props) => {
 
@@ -69,7 +70,7 @@ const ApprovedLoanRequest = (props) => {
 		<div className="profile-header">
 			<div className="user-detail">
 				<div className="user-image">
-					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
+				   <img src={`${IMAGEPATH}${userprofile.userdetails.profileImage}`}/>
 				</div>
 				<div className="user-data">
 					<h2>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>

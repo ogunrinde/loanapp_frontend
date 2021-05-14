@@ -27,6 +27,7 @@ const Loantodisbursed = (props) =>
     const [view_more, setview_more] = useState(false);
     const [request, setrequest] = useState({});
     const month = useSelector(state => state.root.month);
+    const userdetails = useSelector(state => state.root.userbasicdetails);
     const type = 'lender';
     
     useEffect(() => {

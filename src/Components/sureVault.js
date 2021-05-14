@@ -38,6 +38,8 @@ const SureVault = (props) =>
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
     const IsFetching = useSelector(state => state.root.IsFetching);
+    const route = useSelector(state => state.root.route);
+    const user = useSelector(state => state.root.user);
     const onSubmit = async (data, e) => {
         await dispatch(MakeAvailable(data));
         e.target.reset();
@@ -56,25 +58,21 @@ const SureVault = (props) =>
     return(
         <div>
             <ReactNotification />
-            <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
+            {/* <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
                 <div class="container h-100">
                     <div class="row h-100 align-items-center">
                         <div class="col-12">
                             <div class="breadcrumb-content">
                                 <h2>Sure Vault Creation</h2>
                                 {
-                                   (userdetails != null ||
-                                    userhomeaddress != null ||
-                                    userofficeaddress != null ||
-                                    usersocialmedia != null ||
-                                    bankdetail != null || userdetails.Is_phone_number_verified != 0 || userdetails.Is_email_verified != 0) && <div style={{color:'#fff',marginTop:20,fontSize:17}}>Please Complete your registration to create a vault</div>
+                                   (user != null && Object.keys(user).length > 0 && route != '') && <div style={{color:'#fff',marginTop:20,fontSize:17}}>Please Complete your registration to create a vault</div>
                                 }
                                 
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
            
             <section style={{backgroundColor:'#f1f7f9',padding:20,paddingBottom:40}}>
             <StepWizard initialStep={1}>

@@ -25,10 +25,10 @@ const OtherVaultInformation = (props) => {
     <div className="profilecontainer"> 
     <div id="contact">
     <form onSubmit={handleSubmit(onSubmit)}>
-     <h3>Sure Vault {props.currentStep}</h3>
-      <div className="row" style={{marginTop:20}}>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont" style={{color:'#777777'}}>Email Must be Verified
+     <h3>Sure Vault</h3>
+      <div className="row" style={{marginTop:10}}>
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont" style={{color:'#777777', fontSize:14}}>Email Must be Verified
             <input type="checkbox" 
                     name = "email_must_be_verified"
                     ref={register()}
@@ -36,8 +36,8 @@ const OtherVaultInformation = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont" style={{color:'#777777'}}>Phone Number Must be Verified
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont" style={{color:'#777777',fontSize:14}}>Phone Number Must be Verified
             <input type="checkbox" 
                     name = "phonenumber_must_be_verified"
                     ref={register()}
@@ -45,8 +45,8 @@ const OtherVaultInformation = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
-        <div className="col-lg-4 col-sm-12 col-md-4">
-        <label class="cont"  style={{color:'#777777'}}>BVN must be Verified
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont"  style={{color:'#777777',fontSize:14}}>BVN must be Verified
             <input type="checkbox" 
                     name = "bvn_must_be_verified"
                     ref={register()}
@@ -54,6 +54,16 @@ const OtherVaultInformation = (props) => {
             <span class="checkmark"></span>
         </label>
         </div>
+        <div className="col-lg-3 col-sm-12 col-md-4">
+        <label class="cont"  style={{color:'#777777',fontSize:14}}>CreditBureau Report Required
+            <input type="checkbox" 
+                    name = "bvn_must_be_verified"
+                    ref={register()}
+            />
+            <span class="checkmark"></span>
+        </label>
+        </div>
+     
       </div>
                
       <fieldset>

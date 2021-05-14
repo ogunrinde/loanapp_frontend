@@ -46,16 +46,27 @@ import {
     CITIES,
     VAULT_CREATED,
     SURECONNECT,
-    PAYMENTANALYTICS
+    PAYMENTANALYTICS,
+    SUCCESSCOLOR,
+    ERRORCOLOR,
+    BANKS,
+    CREDIT_REGISTRY_LOGIN,
+    CREDIT_REGISTRY_REPORT,
+    WITHDRAWFROMREPAYMENT
 
 } from './constants';
+import React from 'react';
 import { store } from '../store/store';
 import { Success, Error } from '../../Message/message';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactNotification from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
+import toast from 'toasted-notes' 
+import 'toasted-notes/src/styles.css';
+import { GetpendingApprovals } from './loan';
+
 //import { store } from 'react-notifications-component';
 
 //const PATH = 'http://surebanker.online/surebanker/api/';
@@ -79,6 +90,7 @@ const AUTHINSTANCE = axios.create({
             }
 });
 
+
 //alert(JSON.stringify(store.getState().root.token));
 
 const Analytics = (schedules,dispatch) => {
@@ -89,7 +101,8 @@ const Analytics = (schedules,dispatch) => {
         let overdues = 0;
         let totalpending = 0;
         let nextpaydate = '';
-        let data = {paid : 0, overdues : 0, totalpending : 0, nextpaydate : 0 };
+        let todaydue = 0;
+        let data = {paid : 0, overdues : 0, totalpending : 0, nextpaydate : 0, todaydue:0 };
         for (let r = 0; r < schedules.length; r++)
         {
             let paydate = new Date(schedules[r].dueDate).getTime()
@@ -101,9 +114,13 @@ const Analytics = (schedules,dispatch) => {
             {
                 overdues += parseFloat(schedules[r].expected_amount_to_paid);
             }
-            if(schedules[r].status == 'paid')
+            if(today == paydate && schedules[r].status.toLowerCase() == 'pending')
             {
-                paid += schedules[r].expected_amount_to_paid;
+                todaydue += parseFloat(schedules[r].expected_amount_to_paid);
+            }
+            if(schedules[r].status == 'Paid')
+            {
+                paid += parseFloat(schedules[r].expected_amount_to_paid);
             }
             if(schedules[r].status.toLowerCase() == 'pending')
             {
@@ -115,7 +132,7 @@ const Analytics = (schedules,dispatch) => {
                 nextpaydate = schedules[r].dueDate;
             }
         }
-      data = {paid : paid, overdues : overdues, totalpending : totalpending, nextpaydate : nextpaydate };
+      data = {paid : paid.toFixed(2), todaydue: todaydue, overdues : overdues, totalpending : totalpending, nextpaydate : nextpaydate };
       //alert(JSON.stringify(data));
       dispatch({ type: PAYMENTANALYTICS, payload:data  }); 
     }
@@ -159,7 +176,64 @@ export function updateregisterstatus (payload)
 };
 
 
-export function user_attempt_login(data,history,from)
+export function creditregistry()
+{
+    return function(dispatch,getState)
+    {   
+        dispatch({ type: REQUEST_STATUS  });
+        return INSTANCE.post('https://api.creditregistry.org/nigeria/AutoCred/v5.Test/api/Agents/Login',{
+                EmailAddress: "string",
+                Password: "string",
+                SubscriberID: "string"
+          })
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                await dispatch({ type: CREDIT_REGISTRY_LOGIN, payload: response.data });
+            }else{  
+                //Error("Login Status", response.data.message);
+            }
+        }).catch(err => {
+            dispatch({ type: REQUEST_STATUS  }); 
+        }); 
+    }
+}
+
+export function creditregistryreport(bvn)
+{
+    return function(dispatch,getState)
+    {   
+        dispatch({ type: REQUEST_STATUS  });
+        return INSTANCE.post('https://api.creditregistry.org/nigeria/AutoCred/v5.Test/api/Agents/Reports/Reports_GetData2',{
+                SessionCode: "string",
+                ReportDataRequest: {
+                BVN: bvn,
+                AccountOwnerIDs: "string",
+                HistoryLengthInMonths: 0,
+                SectorExclusionIDs: "string",
+                IncludeSMARTScore: true,
+                IncludePDFReport: true,
+                PDFReportType: "None",
+                Reason: "string"
+            }
+          })
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                await dispatch({ type: CREDIT_REGISTRY_REPORT, payload: response.data });
+            }else{  
+                //Error("Login Status", response.data.message);
+            }
+        }).catch(err => {
+            dispatch({ type: REQUEST_STATUS  }); 
+        }); 
+    }
+}
+
+
+
+
+export function user_attempt_login(data,history,from, props)
 {
     return function(dispatch,getState)
     {
@@ -172,21 +246,22 @@ export function user_attempt_login(data,history,from)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
-                //console.log(response.data);
-                //alert(JSON.stringify(response.data));
+                await dispatch({type: MAIN_RESET});
                 await dispatch({ type: USER_LOGIN, payload: response.data });
+                await dispatch(GetpendingApprovals());
                 Success('Login Status','Login Successful');
-                sessionStorage.setItem("token",response.data.access_token);
-                history.replace(from);
-                //console.log(response.data);
+                //alert(JSON.stringify(response.data.userinformation.userdetails));
+                if(response.data.route != '')
+                {
+                    props.history.push(`${response.data.route}`);
+                }
+                else history.replace(from);
             }else{  
                 Error("Login Status", response.data.message);
             }
         }).catch(err => {
-            dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', 'Error whiling processing data...try again later');
-            //else Error('Failed Attempt',err.message);   
+            //alert(JSON.stringify(err.response));
+            dispatch({ type: REQUEST_STATUS  }); 
         }); 
     }
 }
@@ -203,19 +278,24 @@ export function user_attempt_register(data,props) {
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
+                await dispatch({type: MAIN_RESET});
                 await dispatch({ type: USER_REGISTER, payload: response.data });
                 Success('Account Creation','Registration Successful');
+                //alert('Okay');
+                //ToastSuccess("Registration Successful");
                 sessionStorage.setItem("token",response.data.access_token);
-                //console.log(response.data);
-                //props.history.push('/home/profile');
+                ////console.log(response.data);
+                props.history.push('/userprofile');
             }else {
+                //ToastError(response.data.error);
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
+            
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', 'Error whiling processing data...try again later');
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', 'Error whiling processing data...try again later');
 
         }); 
     }
@@ -230,7 +310,7 @@ export function places()
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
-                console.log(response.data);
+                ////console.log(response.data);
                 dispatch({ type: COUNTRIES, payload: response.data });
                 //alert(JSON.stringify(response.data));
             }else {
@@ -238,9 +318,9 @@ export function places()
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', 'Error whiling processing data...try again later');
-            //console.log(err);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', 'Error whiling processing data...try again later');
+            ////console.log(err);
 
         }); 
     }
@@ -261,9 +341,10 @@ export function countrystates(id)
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            //alert(JSON.stringify(err));
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -271,6 +352,7 @@ export function countrystates(id)
 
 export function Getcities(id)
 {
+    //alert(id);
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
         return INSTANCE.get(`city/${id}`)
@@ -284,15 +366,15 @@ export function Getcities(id)
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function userbasicInfo(data)
+export function userbasicInfo(data,props, e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -300,7 +382,7 @@ export function userbasicInfo(data)
             baseURL: `${PATH}`,
             timeout: 20000,
             headers: {
-                      'Content-Type': 'application/json', 
+                      //'Content-Type': 'application/json', 
                        'Accept': 'application/json',
                        'Authorization': `Bearer ${store.getState().root.token}`
                     }
@@ -311,21 +393,23 @@ export function userbasicInfo(data)
             if(response.data.status === 'success'){
                 dispatch({ type: USERBASICDETAILS, payload: response.data });
                 Success('User Updated','User Information Saved Successfully...');
+                e.target.reset();
+                props.history.push('/userprofile/homeaddress');
+                //props.nextStep();
                 //alert(JSON.stringify(response.data));
             }else {
-                
+                Error('Request failed', response.data.error);
+                //alert(JSON.stringify(response.data));
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
-
+            //alert(JSON.stringify(err));
+            Error('Request failed', err.response.error);
         }); 
     }
 }
 
-export function UserhomeAddress(data)
+export function UserhomeAddress(data, props,e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -341,25 +425,28 @@ export function UserhomeAddress(data)
         return AUTH.post(`userHomeAddress`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            console.log(response.data);
+            //console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: USERHOMEADDRESS, payload: response.data });
                 Success('User Updated','User Information Saved Successfully...');
+                e.target.reset();
+                props.history.push('/userprofile/officeaddress');
+                //props.nextStep();
                 //alert(JSON.stringify(response.data));
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function UserOfficeAddress(data)
+export function UserOfficeAddress(data,props,e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -375,25 +462,27 @@ export function UserOfficeAddress(data)
         return AUTH.post(`userOfficeAddress`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: USEROFFICEADDRESS, payload: response.data });
                 Success('User Updated','User Information Saved Successfully...');
+                e.target.reset();
+                props.history.push('/userprofile/socialmedia');
                 //alert(JSON.stringify(response.data));
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function SocialMediaAccounts(data)
+export function SocialMediaAccounts(data, props, e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -409,26 +498,28 @@ export function SocialMediaAccounts(data)
         return AUTH.post(`userSocialMediaAccounts`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            console.log(response.data);
+            //console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: USERMEDIAACCOUNT, payload: response.data });
                 Success('User Updated','User Information Saved Successfully...');
+                e.target.reset();
+                props.history.push('/userprofile/bankinformation');
                 //alert(JSON.stringify(response.data));
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function BankInformation(data)
+export function BankInformation(data,props,e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -444,19 +535,37 @@ export function BankInformation(data)
         return AUTH.post(`bankinfo`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            console.log(response.data);
+            //console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: USERBANKINFORMATION, payload: response.data });
-                Success('Congratulations','You have completed your registration');
+                Success('Congratulations','You have completed your registration...Next stage is Credential Verifications');
+                props.history.push('/userprofile/verification');
             }else {
-                Error('Failed Attempt',response.data.error);
+               
+                if(response.data.message.status !== undefined && response.data.message.status == false)
+                {
+                    Error('Request failed', response.data.error);
+                }
+                   
+                else if(response.data.message.firstname !== undefined && response.data.message.firstname == 0){
+                    Error('Request failed', response.data.error); 
+                    props.goToStep(1);
+                }  
+                else if(response.data.message.surname !== undefined && response.data.message.surname == 0)  
+                {
+                    Error('Request failed', response.data.error);
+                    props.goToStep(1);
+                }
+                else  
+                   Error('Request failed', response.data.error); 
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            alert(JSON.stringify(err));
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -479,7 +588,7 @@ export function SendRequest(data,props,offers)
         return AUTH.post(`loanrequest`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 response.data.offers = offers;
                 dispatch({ type: MAKEREQUEST, payload: response.data });
@@ -491,22 +600,64 @@ export function SendRequest(data,props,offers)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function MakeAvailable()
+export function ConnectwithLenderviaSearch(data,vaultId, lenderId,e)
+{
+
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.post(`loanrequestandconnect/${vaultId}`,data)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            ////console.log(response.data);
+            if(response.data.status === 'success'){
+                //response.data.offers = offers;
+                //dispatch({ type: MAKEREQUEST, payload: response.data });
+                
+                Success('User Updated','Loan Request Created Successfully...Please Wait while we complete you request');
+                await dispatch(ConnectwithLender(lenderId, vaultId, response.data.loanrequest.id));
+                e.target.reset();
+                //props.history.push('/sureoffers');
+                //alert(JSON.stringify(response.data));
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            ////console.log(err);
+            //alert(JSON.stringify(err));
+            dispatch({ type: REQUEST_STATUS  });
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
+
+        }); 
+    }
+}
+
+export function MakeAvailable(props)
 {
     return function(dispatch, getState){
         let data = getState().createvault;
         //alert(JSON.stringify(data));
-        //console.log(data);
+        ////console.log(data);
         dispatch({ type: REQUEST_STATUS  });
         const AUTH = axios.create({
             baseURL: `${PATH}`,
@@ -519,20 +670,23 @@ export function MakeAvailable()
         });
         return AUTH.post(`supplyloan`,data)
         .then(async (response) => {
-            //console.log(response.data);
+            ////console.log(response.data);
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 Success('Success','Data Saved Successfully');
                 dispatch({ type: VAULT_CREATED  });
+                setTimeout( () => { window.location.href = '/surevault'; }, 5000);
+                
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            alert(JSON.stringify(err));
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -553,20 +707,22 @@ export function ConnectwithLender(lenderId, vaultId, requestId)
         });
         return AUTH.post(`connectborrowerToLender`,data)
         .then(async (response) => {
-            console.log(response.data);
+            //console.log(response.data);
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 Success('Success','Lender has been Notified');
+                //alert(JSON.stringify(response.data));
                 
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
+            //alert(JSON.stringify(err));
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -590,16 +746,16 @@ export function GetProfile(Id)
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: GETPROFILE, payload: response.data });
-                console.log(response.data);
+                ////console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -625,16 +781,17 @@ export function UpdateLoanRequestStatus(status,connectId,borrowerId, requestId)
             if(response.data.status === 'success'){
                 Success('Loan Request',"Borrower's Request Accepted Successfully");
                 dispatch({ type: PENDINGAPPROVALS, payload: response.data})
-                console.log(response.data);
+                ////console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            //alert(JSON.stringify(err));
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -659,17 +816,18 @@ export function UpdateOfferRequestStatus(status,connectId,lenderId, requestId)
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 Success('Loan Offer',"Lender's Offer Accepted Successfully");
+                await dispatch(GetBorrowerpendingapprovals());
                 //dispatch({ type: PENDINGAPPROVALS, payload: response.data})
-                //console.log(response.data);
+                ////console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -693,16 +851,16 @@ export function GetLoanToBeDisbursed()
             if(response.data.status === 'success'){
                 //Success('Loan Request',"Borrower's Request Accepted Successfully");
                 dispatch({ type: TOBEDISBURSED, payload: response.data})
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -726,16 +884,16 @@ export function GetVault(Id)
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: GETVAULT, payload: response.data });
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -758,12 +916,12 @@ export function GetUserLoanRequest(Id)
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: MAKEREQUEST, payload: response.data });
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
             //if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
             //else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
@@ -793,16 +951,52 @@ export function UpdateSuredeal(data)
                 dispatch({ type: UPDATESUREDEAL, payload: response.data });
                 dispatch({ type: TOBEDISBURSED, payload: response.data})
                 Success('Sure Deal',"Disbursement Information Saved Successfully");
-                //console.log(response.data);
+                ////console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
+
+        }); 
+    }
+}
+
+export function WithdrawforVault(vaultId)
+{
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.post(`withdrawfromvault`,{vaultId:vaultId})
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                 dispatch({ type: MYVAULT, payload: response.data});
+                //dispatch({ type: UPDATESUREDEAL, payload: response.data });
+                //dispatch({ type: TOBEDISBURSED, payload: response.data})
+                Success('Status',"Withdrawal request Successful");
+                ////console.log(response.data);
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            //console.log(err);
+            dispatch({ type: REQUEST_STATUS  });
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -826,16 +1020,16 @@ export function GetLoansDisbursed()
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: LOANSDISBURSED, payload: response.data})
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -860,16 +1054,16 @@ export function GetborrowersLoansDisbursed()
             if(response.data.status === 'success'){
                 dispatch({ type: LOANSRECEIVED, payload: response.data});
                 //alert(JSON.stringify(response.data));
-                //console.log(response.data);
+                ////console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -893,16 +1087,16 @@ export function GetBorrowerApprovedLoans()
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: MYAPPROVEDLOANS, payload: response.data})
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -926,16 +1120,16 @@ export function GetBorrowerpendingapprovals()
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: MYPENDINGAPPROVALLOANS, payload: response.data})
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -960,16 +1154,16 @@ export function UserActivitiesAnalytics()
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){
                 dispatch({ type: ANALYTICS, payload: response.data})
-                console.log(response.data);
+                //console.log(response.data);
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -991,26 +1185,27 @@ export function GetCompleteUserProfile()
         return AUTH.get(`getcompleteuserprofile`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: COMPLETEUSERPROFILE, payload: response.data});
-                //console.log(response.data.userdetails);
-                if(response.data.userdetails == null) dispatch({ type: NEXTPHASE, payload: 0});
-                else if(response.data.homeaddress == null) dispatch({ type: NEXTPHASE, payload: 1});
-                else if(response.data.officeaddress == null) dispatch({ type: NEXTPHASE, payload: 2});
-                else if(response.data.socialmedia == null) dispatch({ type: NEXTPHASE, payload: 3});
-                else if(response.data.bankdetails == null) dispatch({ type: NEXTPHASE, payload: 4});
-                else dispatch({ type: NEXTPHASE, payload: 4});
+                ////console.log(response.data.userdetails);
+                //alert(JSON.stringify(response.data));
+                // if(response.data.userdetails == null) dispatch({ type: NEXTPHASE, payload: 0});
+                // else if(response.data.homeaddress == null) dispatch({ type: NEXTPHASE, payload: 1});
+                // else if(response.data.officeaddress == null) dispatch({ type: NEXTPHASE, payload: 2});
+                // else if(response.data.socialmedia == null) dispatch({ type: NEXTPHASE, payload: 3});
+                // else if(response.data.bankdetails == null) dispatch({ type: NEXTPHASE, payload: 4});
+                // else dispatch({ type: NEXTPHASE, payload: 4});
                 
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1032,19 +1227,21 @@ export function GetCompleteVault()
         return AUTH.get(`getvault`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: MYVAULT, payload: response.data});
-                
+                //alert(JSON.stringify(response.data));
             }else {
                 Error('Failed Attempt',response.data.error);
+                //alert(JSON.stringify(response.data));
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            //alert(JSON.stringify(err.response.data));
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1066,7 +1263,7 @@ export function GetTransactions(Id)
         return AUTH.get(`gettransaction/${Id}`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: MYVAULTTRANSACTIONS, payload: response.data});
                 
@@ -1074,11 +1271,11 @@ export function GetTransactions(Id)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            //console.log(err);
+            ////console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1110,7 +1307,7 @@ export function PeerToPeer(data,props)
         return AUTH.post(`peer`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: MAKEREQUEST, payload: response.data });
                 props.history.push('/sureoffers');
@@ -1122,9 +1319,9 @@ export function PeerToPeer(data,props)
         }).catch(err => {
             
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1152,11 +1349,11 @@ export function GetBorrowerAllLoansRequest()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1179,7 +1376,7 @@ export function ResearchforLender(data,props)
         return AUTH.post(`getLendersForBorrower`,data)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: MAKEREQUEST, payload: response.data });
                 //Success('User Updated','User Information Saved Successfully...');
@@ -1189,17 +1386,17 @@ export function ResearchforLender(data,props)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function GetBorrowersRepayment()
+export function GetBorrowersRepayment(requestID)
 {
     //alert('dhjhdf');
     return function(dispatch){
@@ -1213,10 +1410,10 @@ export function GetBorrowersRepayment()
                        'Authorization': `Bearer ${store.getState().root.token}`
                     }
         });
-        return AUTH.get(`repayments_borrower`)
+        return AUTH.get(`repayments_borrower/${requestID}`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: REPAYMENT_BORROWER, payload: response.data });
                 //alert(JSON.stringify(response.data));
@@ -1224,11 +1421,11 @@ export function GetBorrowersRepayment()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1251,7 +1448,7 @@ export function GetLenderRepaymentfromBorrower()
         return AUTH.get(`repayments_lender`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: REPAYMENT_LENDER, payload: response.data });
                 //alert(JSON.stringify(response.data));
@@ -1259,11 +1456,11 @@ export function GetLenderRepaymentfromBorrower()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1276,7 +1473,7 @@ export function GetAllLenderOffers()
         return INSTANCE.get(`surelenderoffers`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             //alert('okay2');
             if(response.data.status === 'success'){
                 
@@ -1286,12 +1483,12 @@ export function GetAllLenderOffers()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1304,7 +1501,7 @@ export function GetAllBorrowerOffers()
         return INSTANCE.get(`sureborroweroffers`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             //alert('okay2');
             if(response.data.status === 'success'){
                 
@@ -1314,12 +1511,12 @@ export function GetAllBorrowerOffers()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1343,24 +1540,25 @@ export function ConnectwithBorrower(data)
             if(response.data.status === 'success'){ 
                 dispatch({ type: CONNECTWITHBORROWER, payload: response.data });
                 //alert(JSON.stringify(response.data));
-                Success('Connection Status',"Successful");
+                Success('Connection Status',"Successful, You have been connected to Borrower");
             }else {
                 Error('Failed Attempt',response.data.error);
                 //alert('ufifoof');
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
+            //alert(JSON.stringify(err));
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
 
-export function PeerLenderToBorrower(data,props)
+export function PeerLenderToBorrower(data,props, e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -1377,25 +1575,26 @@ export function PeerLenderToBorrower(data,props)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){ 
-                dispatch({ type: SURECONNECT, payload: response.data });
-                props.history.push('/sureconnect');
-                //sSuccess('Success', 'Request has been sent to Borrower');
+                //dispatch({ type: SURECONNECT, payload: response.data });
+                //props.history.push('/sureconnect');
+                Success('Success', 'Connection Successful...Borrower will be notified');
+                e.target.reset();
             }else {
-                console.log(response.data);
+                //console.log(response.data);
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
 }
-export function PeerBorrowerToLender(data,props)
+export function PeerBorrowerToLender(data,props, e)
 {
     return function(dispatch){
         dispatch({ type: REQUEST_STATUS  });
@@ -1412,19 +1611,20 @@ export function PeerBorrowerToLender(data,props)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
             if(response.data.status === 'success'){ 
-                dispatch({ type: MAKEREQUEST, payload: response.data });
-                props.history.push('/sureOffers');
-                //sSuccess('Success', 'Request has been sent to Borrower');
+                //dispatch({ type: MAKEREQUEST, payload: response.data });
+                e.target.reset();
+                //props.history.push('/sureOffers');
+                Success('Success', 'Request has been Created Successfully and the Lender will be Notified');
             }else {
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1453,12 +1653,12 @@ export function GetBorrowerOverdues()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1487,12 +1687,12 @@ export function GetLenderOverdues()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             //alert('dhfhf');
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1517,7 +1717,7 @@ export function GetBorrowerPaymentSchedules(id)
         return AUTH.get(`borrower_payment_schedules/${id}`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: BORROWER_PAYMENT_SCHEDULES, payload: response.data });
                 Analytics(response.data.schedules,dispatch);
@@ -1526,11 +1726,11 @@ export function GetBorrowerPaymentSchedules(id)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1552,7 +1752,7 @@ export function GetLenderPaymentSchedules(id)
         return AUTH.get(`lender_payment_schedules/${id}`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data);
+            ////console.log(response.data);
             if(response.data.status === 'success'){
                 dispatch({ type: LENDER_PAYMENT_SCHEDULES, payload: response.data });
                 Analytics(response.data.schedules,dispatch);
@@ -1561,11 +1761,11 @@ export function GetLenderPaymentSchedules(id)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
-            if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
-            else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
-            else Error('Failed Attempt',err.message);
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
 
         }); 
     }
@@ -1596,10 +1796,10 @@ export function VerifyEmailNow(email)
                 dispatch({ type: VERIFY_EMAIL, payload: response.data });
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
 
-            Error('Failed Attempting','Error whiling processing data...try again later');
+            //Error('Failed Attempting','Error whiling processing data...try again later');
 
         }); 
     }
@@ -1628,10 +1828,43 @@ export function VerifyPhone(code)
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
 
-            Error('Failed Attempting','Error whiling processing data...try again later');
+            //Error('Failed Attempting','Error whiling processing data...try again later');
+
+        }); 
+    }
+}
+
+export function VerifyEmailAccount(code)
+{
+    
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.post(`verify_email/${code}`,{})
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                Success('Verification Status', response.data.message);
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            //console.log(err);
+           
+            dispatch({ type: REQUEST_STATUS  });
+
+            //Error('Failed Attempting','Error whiling processing data...try again later');
 
         }); 
     }
@@ -1660,10 +1893,76 @@ export function SendCode()
                 Error('Failed Attempt',response.data.error);
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
+            alert(JSON.stringify(err));
             dispatch({ type: REQUEST_STATUS  });
 
-            Error('Failed Attempting','Error whiling processing data...try again later');
+            //Error('Failed Attempting','Error whiling processing data...try again later');
+
+        }); 
+    }
+}
+
+export function SendEmailCode()
+{
+    
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.get(`emailcode`)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                Success('Code Status', 'Code sent to your Email');
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            alert(JSON.stringify(err));
+            //console.log(err);
+            dispatch({ type: REQUEST_STATUS  });
+
+            //Error('Failed Attempting','Error whiling processing data...try again later');
+
+        }); 
+    }
+}
+
+export function BorrowerWithdrawcash(requestId)
+{
+    
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.get(`borrowerwithdrawcash/${requestId}`)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                Success('Status',response.data.message);
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            //console.log(err);
+            dispatch({ type: REQUEST_STATUS  });
+
+            //Error('Failed Attempting','Error whiling processing data...try again later');
 
         }); 
     }
@@ -1694,10 +1993,42 @@ export function GetEmailLink(email)
                 //dispatch({ type: VERIFY_EMAIL, payload: response.data });
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
 
-            Error('Failed Attempting','Error whiling processing data...try again later');
+            //Error('Failed Attempting','Error whiling processing data...try again later');
+
+        }); 
+    }
+}
+export function GetBanks()
+{
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.get(`getbanks`)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                //Success('Status',response.data.message);
+                dispatch({ type: BANKS, payload: response.data });
+                //alert(JSON.stringify(response.data));
+            }else {
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            //console.log(err);
+            dispatch({ type: REQUEST_STATUS  });
+            //alert(JSON.stringify(err));
+            //Error('Failed Attempting','Error whiling processing data...try again later');
 
         }); 
     }
@@ -1719,7 +2050,7 @@ export function countrycodes()
         return INSTANCE.get(`countrycodes`)
         .then(async (response) => {
             dispatch({ type: REQUEST_STATUS  });
-            //console.log(response.data.codes.);
+            ////console.log(response.data.codes.);
             if(response.data.status === 'success'){
                 let alldata = [];
                 for (var key in response.data.codes) {
@@ -1734,10 +2065,110 @@ export function countrycodes()
                 //dispatch({ type: VERIFY_EMAIL, payload: response.data });
             }
         }).catch(err => {
-            console.log(err);
+            //console.log(err);
             dispatch({ type: REQUEST_STATUS  });
 
-            Error('Failed Attempting','Error whiling processing data...try again later');
+            //Error('Failed Attempting','Error whiling processing data...try again later');
+
+        }); 
+    }
+}
+
+export function UpdatePayment(data, requestid)
+{
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.post(`borrowermadepayment/${requestid}`,data)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){ 
+                Success("Success", response.data.message);
+            }else {
+                ////console.log(response.data);
+                Error('Failed Attempt',response.data.error);
+            }
+        }).catch(err => {
+            //console.log(err);
+            //alert('dhfhf');
+            dispatch({ type: REQUEST_STATUS  });
+            // if(err.response) Error('Failed Attempt','Error whiling processing data...try again later');
+            // else if(err.request) Error('Failed Attempt', JSON.stringify(err.request));
+            // else Error('Failed Attempt',err.message);
+
+        }); 
+    }
+}
+
+
+export function GetRepayment()
+{
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.get(`getrepayment`)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                dispatch({ type: WITHDRAWFROMREPAYMENT, payload: response.data });
+                //alert(JSON.stringify(response.data));
+            }else {
+                Error('Failed Attempt',response.data.error);
+                alert(JSON.stringify(response.data));
+            }
+        }).catch(err => {
+            dispatch({ type: REQUEST_STATUS  });
+            alert(JSON.stringify(err));
+        }); 
+    }
+}
+
+export function LenderWithdrawcash(requestId,data)
+{
+    
+    return function(dispatch){
+        dispatch({ type: REQUEST_STATUS  });
+        const AUTH = axios.create({
+            baseURL: `${PATH}`,
+            timeout: 20000,
+            headers: {
+                      'Content-Type': 'application/json', 
+                       'Accept': 'application/json',
+                       'Authorization': `Bearer ${store.getState().root.token}`
+                    }
+        });
+        return AUTH.post(`lenderwithdrawcash/${requestId}`, data)
+        .then(async (response) => {
+            dispatch({ type: REQUEST_STATUS  });
+            if(response.data.status === 'success'){
+                Success('Status',response.data.message);
+                dispatch({ type: WITHDRAWFROMREPAYMENT, payload: response.data });
+            }else {
+                Error('Failed Attempt',response.data.error);
+                //alert(JSON.stringify(response.data));
+            }
+        }).catch(err => {
+            //console.log(err);
+            //alert(JSON.stringify(err));
+            dispatch({ type: REQUEST_STATUS  });
+
+            //Error('Failed Attempting','Error whiling processing data...try again later');
 
         }); 
     }

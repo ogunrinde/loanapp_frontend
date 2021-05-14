@@ -2,13 +2,28 @@ import React, {useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import $ from 'jquery';
 import '../../css/account/custom.css';
-import { GetProfile, UpdateLoanRequestStatus, UpdateSuredeal } from '../redux/action/index';
+import { GetProfile, UpdateLoanRequestStatus, UpdateSuredeal, BorrowerWithdrawcash } from '../redux/action/index';
 import Loader from 'react-loader-spinner';
 import ReactNotification from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
 import { store } from 'react-notifications-component';
 import { useForm } from 'react-hook-form';
 import '../../css/css/profile.css';
+import { usePaystackPayment, PaystackButton,PaystackConsumer } from 'react-paystack';
+import { PAYSTACK_APIKEY } from '../redux/action/constants';
+import { IMAGEPATH } from '../redux/action/constants';
+//import { config } from '@fortawesome/fontawesome-svg-core';
+
+
+
+// const PaystackHook = () => {
+// 	const initializePayment = usePaystackPayment(config);
+// 	return (
+// 		<div>
+// 			<button onClick = {()  => { initializePayment() }}>Paystack Hook</button>
+// 		</div>
+// 	);
+// }
 
 const Request = (props) => {
 
@@ -18,19 +33,57 @@ const Request = (props) => {
 	const dispatch = useDispatch();
 	const userprofile = useSelector(state => state.root.viewuserprofile);
 	const [IsSubmitting, setIsSubmitting] = useState(false);
+	const [isDisbursed, setIsDisbursed] = useState(false);
+	const [IsWithdrawing, setIsWithdrawing ] = useState(false);
 	const request = props.request;
 	const type = props.type;
+	const userdetails = useSelector(state => state.root.userbasicdetails);
+	//const userdetails = props.userdetails;
+	//alert(JSON.stringify(userdetails));
 
-	const onSubmit = async data => {
-		//alert(JSON.stringify(data));
+	//alert(JSON.stringify(userprofile));
+	const componentProps = {
+		reference : (new Date()).getTime(),
+		email: userdetails.email,
+		amount:request.request.requestAmount * 100,
+		publicKey: PAYSTACK_APIKEY,
+		text:'Transfer',
+		onSuccess: (response) => {
+			UpdateDisbursed(response);
+			setIsDisbursed(true);
+			//alert(JSON.stringify(response));
+			//console.log(response);
+		},
+		onClose: () => {
+			//window.location.href = '/loantobedisbursed';
+		}
+	};
+
+	const UpdateDisbursed = async (response) => {
 		setIsDisbursing(true);
+		let data = {connectionId : request.lender_borrower_connection_id, dealId: request.id, response: response, Amount_disbursed : request.request.requestAmount, reference:response.reference};
 		await dispatch(UpdateSuredeal(data));
 		setIsDisbursing(false);
 	}
+	const onSubmit = async data => {
+		//alert(JSON.stringify(data));
+		setIsDisbursing(true);
+		//await dispatch(UpdateSuredeal(data));
+		setIsDisbursing(false);
+	}
+
+	const BorrowerWithdrawCash = async () => {
+		setIsWithdrawing(true);
+		await dispatch(BorrowerWithdrawcash(request.request.id));
+		setIsWithdrawing(false);
+	}
+
+	
     useEffect(() =>{
 		getUserInformation();
+		setIsDisbursed(false);
 		//alert(JSON.stringify(request));
-    },[]);
+    },[request]);
     if(Object.keys(userprofile).length > 0)
     {
 		//console.log(request);
@@ -69,7 +122,7 @@ const Request = (props) => {
 		<div className="profile-header">
 			<div className="user-detail">
 				<div className="user-image">
-					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
+					<img src={`${IMAGEPATH}${userprofile.userdetails.profileImage}`}/>
 				</div>
 				<div className="user-data">
 					<h2>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
@@ -114,6 +167,7 @@ const Request = (props) => {
 					<li className="tab-link" data-tab="request">Request</li>
 					<li hidden = {type == 'borrower' ? true : false} className="tab-link" data-tab="todisburse">Disburse Loan</li>
 					<li hidden = {type == 'borrower' ? true : false} className="tab-link" data-tab="disbursed">Disbursed</li>
+					<li hidden = {type == 'borrower' ? false : true} className="tab-link" data-tab="withdraw">Withdraw Cash</li>
 				</ul>
 				<div id="officeaddress" className="tab-content current">
 			     	<div className="bio-box">
@@ -235,7 +289,7 @@ const Request = (props) => {
 					<div id="">
 					<form onSubmit={handleSubmit(onSubmit)}>
 					<div className = "row" style={{marginTop:20}}>
-						<div className="col-md-6 col-lg-6 col-sm-12">
+						{/* <div className="col-md-6 col-lg-6 col-sm-12">
 						<div class="form-group">
 							<label style={{fontSize:13}}>Is Cash Disbursed</label>
 							<select 
@@ -246,18 +300,18 @@ const Request = (props) => {
 									required: "Required"
 								})}
 								>
-								<option value=""></option>	
 								<option value="1">Yes</option>
 								<option value ="0">No</option>
 							</select>
 							<small className="text-danger">{errors.Is_cash_disbursed?.type == "required" && "Cash Disbursed Status is required"}</small>
 						</div>
-						</div>
-						<div className="col-md6 col-lg-6 col-sm-12">
+						</div> */}
+						<div className="col-md6 col-lg-12 col-sm-12">
 						<div class="form-group">
-							<label for="exampleInputEmail1" style={{fontSize:13}}>Amount Disbursed</label>
+							<label for="exampleInputEmail1" style={{fontSize:13}}>Amount Disbursed (NGN)</label>
 							<input 
 								style={{fontSize:14, borderColor:'#f1f7f9'}}
+								disabled = "true"
 								type="number"
 								name="Amount_disbursed"
 								value={request.request.requestAmount}
@@ -274,7 +328,7 @@ const Request = (props) => {
 						</div>
 					</div>	
 					<div className = "row">
-						<div className="col-md-6 col-lg-6 col-sm-12">
+						{/* <div className="col-md-6 col-lg-6 col-sm-12">
 						<div class="form-group">
 							<label for="exampleInputEmail1" style={{fontSize:13}}>Date Disbursed</label>
 							<input 
@@ -291,22 +345,23 @@ const Request = (props) => {
 							/>
 							<small className="text-danger">{errors.date_disbursed?.type == "required" && "Date Disbursed is required"}</small>
 						</div>
-						</div>
-						<div className="col-md-6 col-lg-6 col-sm-12">
+						</div> */}
+						<div style={{display:'none'}} className="col-md-6 col-lg-6 col-sm-12">
 						<div class="form-group">
 							<label for="exampleInputEmail1" style={{fontSize:13}}>Mode of Disbursement</label>
 							<select 
 							    style={{fontSize:14, borderColor:'#f1f7f9'}}
 								className="form-control"
 								name = "mode_of_disbursement"
+								value = "Paystack"
 								ref={register({
 									required: "Required"
 								})}
 							>
 								<option value=""></option>
-								<option value="bank transfer">Bank Transfer</option>
-								<option value ="ussd">USSD</option>
-								<option value ="Internet Banking">Internet Banking</option>
+								<option value="Paystack">Paystack</option>
+								{/* <option value ="ussd">USSD</option>
+								<option value ="Internet Banking">Internet Banking</option> */}
 							</select>
 							<small className="text-danger">{errors.mode_of_disbursement?.type == "required" && "Mode of Payment is required"}</small>	
 
@@ -314,7 +369,7 @@ const Request = (props) => {
 						</div>
 					</div>
 					
-					<div class="form-group">
+					{/* <div class="form-group">
 						<label for="exampleInputPassword1" style={{fontSize:13}}>Upload Evidence of Payment</label>
 						<input type="file" style={{fontSize:14, borderColor:'#f1f7f9'}} class="form-control" id="exampleInputPassword1" placeholder=""/>
 						<input 
@@ -341,8 +396,8 @@ const Request = (props) => {
 								required: "Required"
 							})}
 						/>
-					</div>
-					<button hidden={IsDisbursing} type="submit" style={{padding:5,marginTop:20,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Update Request</button>
+					</div> */}
+					{/* <button hidden={IsDisbursing} type="submit" style={{padding:5,marginTop:20,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Disburse Cash Now</button> */}
 				    <Loader
 						visible={IsDisbursing}
 						type="Puff"
@@ -353,6 +408,13 @@ const Request = (props) => {
 				
 					/>
 					</form>
+					{
+						isDisbursed == false &&
+						<PaystackConsumer {...componentProps }>
+							{({initializePayment}) => <button onClick = {() => initializePayment()} style={{padding:5,marginTop:20,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Disburse Cash Now</button>}
+						</PaystackConsumer>
+					}
+					
 					</div>
 					</div>
 				</div>
@@ -397,6 +459,47 @@ const Request = (props) => {
 						</div>
 					</div>
 					
+				</div>
+
+				<div id="withdraw" className="tab-content">
+					<div className=""> 
+					<div id="">
+					<div>
+					<div className = "row" style={{marginTop:20}}>
+						<div className="col-md6 col-lg-12 col-sm-12">
+						<div class="form-group">
+							<label for="exampleInputEmail1" style={{fontSize:13}}>Amount Available for Withdrawal (NGN)</label>
+							<input 
+								style={{fontSize:14, borderColor:'#f1f7f9'}}
+								disabled = "true"
+								type="number"
+								name="Amount_disbursed"
+								value={request.request.requestAmount}
+								class="form-control" 
+								id="exampleInputEmail1" 
+								aria-describedby="emailHelp" 
+								placeholder=""
+								ref={register({
+									required: "Required"
+								})}
+							/>
+							<small className="text-danger">{errors.Amount_disbursed?.type == "required" && "Amount Disbursed is required"}</small>
+						</div>
+						<button hidden = {IsWithdrawing} onClick = {BorrowerWithdrawCash} style={{padding:5,marginTop:20,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Withdraw Now</button>
+						</div>
+					</div>	
+				    <Loader
+						visible={IsWithdrawing}
+						type="Puff"
+						color="#ffbb38"
+						height={30}
+						width={30}
+						timeout= {0} //3 secs
+				
+					/>
+					</div>
+					</div>
+					</div>
 				</div>
 				
 			</div>

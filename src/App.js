@@ -32,6 +32,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import BorrowerMarket from './Components/borrowermarket';
 import LenderMarket from './Components/lendermarket';
 import VerifyEmail from './Components/verifyemail';
+import Scroll from './Components/scroll';
+import UserProfile from './Components/userprofile';
+
 
 
 function PrivateRoute({ children, ...rest }) {
@@ -60,6 +63,7 @@ const App = (props) => {
       <Provider store = {store}>
       <PersistGate loading={null} persistor = {persistor}>  
       <Router>
+          <Scroll />
           <Switch>
             <Route path="/" exact>
               <Header />
@@ -110,6 +114,10 @@ const App = (props) => {
             <PrivateRoute path="/home">
               <Header />
               <Home />
+            </PrivateRoute>
+            <PrivateRoute path="/userprofile">
+              <Header />
+              <UserProfile />
             </PrivateRoute>
             <PrivateRoute path = "/makerequest">
               <Header />

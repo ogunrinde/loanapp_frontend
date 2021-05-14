@@ -4,8 +4,10 @@ import '../css/css/profile.css';
 import { useForm } from "react-hook-form";
 import { places, countrystates, Getcities } from '../Components/redux/action/index';
 import { useSelector, useDispatch } from 'react-redux'; 
-import { userbasicInfo, UserhomeAddress } from '../Components/redux/action/index';
+import { userbasicInfo, UserhomeAddress, GetCompleteUserProfile } from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
+import { withRouter } from 'react-router-dom';
+import { GetState, AllGetcities } from './Message/getdata';
 
 
 const HomeAddress = (props) =>
@@ -14,54 +16,95 @@ const HomeAddress = (props) =>
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
     const [ isLoadingCities, setisLoadingCities ] = useState(false);
+    const [ IsSubmitting, setIsSubmitting ] = useState(false);
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
     const cities = useSelector(state => state.root.cities);
     const nextphase = useSelector(state => state.root.nextphase);
     const IsFetching = useSelector(state => state.root.IsFetching);
     const { handleSubmit, register, errors } = useForm();
+    const userdetails = useSelector(state => state.root.userbasicdetails);
+    const userhomeaddress = useSelector(state => state.root.userHomeAddress);
+    const userofficeaddress = useSelector(state => state.root.userOfficeAddress);
+    const usersocialmedia = useSelector(state => state.root.userSocialMediaAccounts);
+    const bankdetail = useSelector(state => state.root.userBankInformation);
 
     useEffect(() =>{
-        setisLoadingCountries(true);
-        dispatch(places());
-        setisLoadingCountries(false);
+        //alert('djjf');
+        process();
+        getcountries();
+        //alert(JSON.stringify(userhomeaddress));
         //if(nextphase == 3) props.nextStep();
     },[nextphase]);
 
-    const handleChange = (event) => {
+
+
+    const getcountries = async () => {
+        setisLoadingCountries(true);
+        await dispatch(places());
+        setisLoadingCountries(false);
+    }
+
+    const handleChange = async (event) => {
         setisLoadingState(true);
-        dispatch(countrystates(event.target.value));
+        await dispatch(countrystates(event.target.value));
         setisLoadingState(false);
     }
 
-    const handleState = (event) => {
+    const process = async () => {
+        // if(userhomeaddress == null)
+        //    await dispatch(GetCompleteUserProfile());
+    }
+
+    const handleState = async (event) => {
         setisLoadingCities(true);
-        dispatch(Getcities(event.target.value));
+        await dispatch(Getcities(event.target.value));
         setisLoadingCities(false);
     }
 
-    const onSubmit = async (data) =>
+    const country = () => {
+        let index = countries.findIndex(x => x.id == userhomeaddress.country_id);
+        //await dispatch(Getcities(id));
+        return countries[index].name;
+    }
+
+    
+
+    
+
+    // const state = (id) => {
+    //     if(states == null || states.length == 0) return false;
+    //     let index = states.findIndex(x => x.id == id);
+    //     return states[index].name;
+    // }
+
+    const onSubmit = async (data,e) =>
     { 
+        setIsSubmitting(true);
         //alert(JSON.stringify(data));
-        await dispatch(UserhomeAddress(data));
-        props.nextStep();
+        await dispatch(UserhomeAddress(data, props,e));
+        setIsSubmitting(false);
+       
     }
     return(
-       
+        <div style={{marginTop:0}}>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Home Address</h3>
-                <div className="row">
+                <div className="row" style={{marginTop:40}}>
                 <div className="col-lg-4 col-sm-12 col-md-6">
                     <fieldset>
                         <select 
                                 name="country_id"
-                                style={{color:'#777777'}}
+                                className="form-control"
+                                defaultValue={userhomeaddress != null ? userhomeaddress.country_id : ''}
+                                style={{color:'#777777', backgroundColor:'#fff'}}
                                 onChange = {(text) => handleChange(text)}
                                 ref={register({
                                     required: "Required",
                                 })}
                             >
-                            <option value ="">Select your Country</option>
+                            
+                            <option value =''>Select your Country </option>
                                 {
                                     countries != null &&
                                     countries.map((country) =>
@@ -75,19 +118,25 @@ const HomeAddress = (props) =>
                     <fieldset>
                             <select 
                                 name="state_id"
+                                className="form-control"
                                 onChange = {(text) => handleState(text)}
-                                style={{color:'#777777'}}    
+                                style={{color:'#777777',backgroundColor:'#fff'}}    
                                 ref={register({
                                     required: "Required",
                                 })}
                             >
-                            <option value ="">Select your State</option>
+                            <option value ={userhomeaddress != null && userhomeaddress.state_id}>{(userhomeaddress != null && userhomeaddress.userhomestate != null && userhomeaddress.userhomestate.name)} </option>
+
                                 {
                                     states != null &&
                                     states.map((state) =>
                                     <option value ={state.id}>{ state.name }</option>
                                 )}
                         </select> 
+                        {
+                            isLoadingState == true &&
+                            <small className="text-danger">Please Wait...loading State</small>
+                        }
                         <small className="text-danger">{errors.state?.type == "required" && "State is required"}</small>
                     </fieldset>
                 </div>
@@ -95,49 +144,60 @@ const HomeAddress = (props) =>
                     <fieldset>
                             <select 
                                 name="city_id"
-                                style={{color:'#777777'}}    
+                                className="form-control"
+                                style={{color:'#777777',backgroundColor:'#fff'}}    
                                 ref={register({
                                     required: "Required",
                                 })}
                             >
-                            <option value ="">Select your City</option>
+                            <option value ={userhomeaddress != null && userhomeaddress.city_id}>{(userhomeaddress != null && userhomeaddress.city != null && userhomeaddress.city.name)} </option>
+
+
                                 {
                                     cities != null &&
                                     cities.map((city) =>
                                     <option value ={city.id}>{ city.name }</option>
                                 )}
                         </select> 
+                        {
+                            isLoadingCities == true &&
+                            <small className="text-danger">Please Wait...loading Cities</small>
+                        }
                         <small className="text-danger">{errors.city?.type == "required" && "City is required"}</small>
                     </fieldset>
                 </div>
                 </div>
-                <div className="row">
+                <div className="row" style={{marginTop:20}}>
                     <div className="col-lg-12 col-sm-12 col-md-12">
                     <fieldset>
-                       <input 
-                            placeholder="House Address" 
-                            type="text" 
-                            tabindex="1" 
-                            autofocus
-                            name="address"
-                            ref={register({
-                                required: "Required"
-                            })}
-                        />
+                        <textarea
+                          className="form-control"
+                          name="address"
+                          placeholder="Address"
+                          ref={register({
+                              required: "Required"
+                          })}
+                        >
+                        {userhomeaddress != null ? userhomeaddress.address : ''}
+                        </textarea>
                         <small className="text-danger">{errors.address?.type == "required" && "House Address is required"}</small>
                     </fieldset>
                     </div>
                 </div>
-                <div className="row">
+                <div className="row" style={{marginTop:30}}>
                     <div className="col-lg-6">
 
                     </div>
                     <div className="col-lg-3">
                     </div>
                     <div className="col-lg-3">
-                    <button hidden={IsFetching} name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
+                    {
+                        isLoadingCities == false && isLoadingCountries == false && isLoadingState == false &&
+                        <button hidden={IsSubmitting} name="submit" className="btn btn-success" style={{backgroundColor:'rgb(255, 187, 56)', border:'none'}} type="submit" id="" data-submit="...Sending">Save and Continue</button>
+
+                    }
                     <Loader
-								visible={IsFetching}
+								visible={IsSubmitting}
 								type="Puff"
 								color="#ffbb38"
 								height={30}
@@ -150,7 +210,8 @@ const HomeAddress = (props) =>
                 
                
             </form>
+        </div>
     );
 }
 
-export default HomeAddress;
+export default withRouter(HomeAddress);

@@ -4,8 +4,9 @@ import '../css/css/profile.css';
 import { useForm } from "react-hook-form";
 import { places, countrystates, Getcities } from '../Components/redux/action/index';
 import { useSelector, useDispatch } from 'react-redux'; 
-import { userbasicInfo, UserhomeAddress, UserOfficeAddress } from '../Components/redux/action/index';
+import { userbasicInfo, UserhomeAddress, UserOfficeAddress, GetCompleteUserProfile } from '../Components/redux/action/index';
 import Loader from 'react-loader-spinner';
+import { withRouter } from 'react-router-dom';
 
 
 const OfficeInfo = (props) =>
@@ -19,16 +20,27 @@ const OfficeInfo = (props) =>
     const [ isLoadingCountries, setisLoadingCountries] = useState(false);
     const [ isLoadingState, setisLoadingState ] = useState(false);
     const [ isLoadingCities, setisLoadingCities] = useState(false);
+    const [ IsSubmitting, setIsSubmitting ] = useState(false);
     const codes = useSelector(state => state.root.codes);
     const cities = useSelector(state => state.root.cities);
+    const userofficeaddress = useSelector(state => state.root.userOfficeAddress);
 
 
     useEffect(() =>{
         setisLoadingCountries(true);
         dispatch(places());
         setisLoadingCountries(false);
+        process();
+        //alert(JSON.stringify(userofficeaddress));
         //if(nextphase == 4) props.nextStep();
     },[nextphase]);
+
+
+
+    const process = async () => {
+        // if(userofficeaddress == null)
+        //    await dispatch(GetCompleteUserProfile());
+    }
 
 
     const handleChange = async (event) => {
@@ -37,17 +49,36 @@ const OfficeInfo = (props) =>
         setisLoadingState(false);
     }
 
-
-    const onSubmit = async (data) => {
-        //alert(JSON.stringify(data));
-       data.contact_number = `${data.mobile1code}${data.contact_number}`; 
-       await dispatch(UserOfficeAddress(data));
-       props.nextStep();
+    const country = (id) => {
+        let index = countries.findIndex(x => x.id == id);
+        //await dispatch(Getcities(id));
+        return countries[index].name;
     }
 
-    const handleState = (event) => {
+    const allstates = (id) => {
+        let index = states.findIndex(x => x.id == id);
+        //await dispatch(Getcities(id));
+        return states[index].name;
+    }
+
+    const allcities = (id) => {
+        let index = cities.findIndex(x => x.id == id);
+        //await dispatch(Getcities(id));
+        return cities[index].name;
+    }
+
+
+    const onSubmit = async (data,e) => {
+        //alert(JSON.stringify(data));
+      // data.contact_number = `${data.mobile1code}${data.contact_number}`; 
+       setIsSubmitting(true);
+       await dispatch(UserOfficeAddress(data, props,e));
+       setIsSubmitting(false);
+    }
+
+    const handleState = async (event) => {
         setisLoadingCities(true);
-        dispatch(Getcities(event.target.value));
+        await dispatch(Getcities(event.target.value));
         setisLoadingCities(false);
     }
 
@@ -57,17 +88,19 @@ const OfficeInfo = (props) =>
        
             <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Office Address</h3>
-                <div className="row">
+                <div className="row" style={{marginTop:30}}>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                             <select 
+                                    className="form-control"
                                     name="employmentstatus"
                                     style={{color:'#777777'}}
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Employment Status</option>
+                                
+                                <option value ={userofficeaddress != null && userofficeaddress.employmentstatus}>{(userofficeaddress != null && userofficeaddress.id) ? userofficeaddress.employmentstatus : 'Select Employment Status'} </option>    
                                 <option value ="Job Hunting">Job Hunting</option>  
                                 <option value ="Contract Staff">Contract Staff</option>
                                 <option value ="Internship">Internship</option>
@@ -80,9 +113,11 @@ const OfficeInfo = (props) =>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                     <fieldset>
                        <input
+                        className="form-control"
                         placeholder="Company/Business Name"
                         type="text" 
                         name="company_name"
+                        defaultValue ={(userofficeaddress != null && userofficeaddress.company_name) ? userofficeaddress.company_name :''}
                         tabindex="1" 
                         autofocus
                         ref={register({
@@ -96,61 +131,40 @@ const OfficeInfo = (props) =>
             
                 </div>
 
-                <div className="row">
+                <div className="row" style={{marginTop:20}}>
                    
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
-                        <div className="row no-gutters">
-                               <div className="col-lg-5 col-sm-5 col-md-5">
-                                 <select 
-                                    name="mobile1code"
-                                    style={{height:45,color:'#777777'}}
-                                    ref={register({
-                                        required: "Required",
-                                    })}
-                                 >
-                                 <option value="">Phone Code</option>   
-                                    {
-                                        codes != null &&
-                                        codes.map((code) => 
-                                            <option value={code.code}>{code.name}</option>
-                                        )
-                                    }
-                                    
-                                 </select> 
-                                 <small className="text-danger">{errors.mobile1code?.type == "required" && "Phone Code is Required"}</small><br/>
-
-                               </div>
-                               <div className="col-lg-1 col-sm-1 col-md-1"></div>
-                               <div className="col-lg-6 col-sm-6 col-md-6">
-                               <input 
+                        <input 
+                                    className="form-control"
                                     placeholder="Contact Number" 
-                                    type="text" 
+                                    type="number" 
                                     tabindex="1" 
+                                    defaultValue ={(userofficeaddress != null && userofficeaddress.contact_number) ? userofficeaddress.contact_number :''}
                                     autofocus
                                     name="contact_number"
                                     ref={register({
                                         required: "Required",
                                         min:100,
-                                        max:999999999999
+                                        max:999999999999999
                                     })}
                                 />
                                 <small className="text-danger">{errors.contact_number?.type == "required" && "Company Phone Number is required"}</small>
                                 <small className="text-danger">{(errors.contact_number?.type == "min" || errors.contact_number?.type == "max") && "Invalid Phone Number"}</small>
-                               </div>
-                          </div>  
                         </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                         <input 
+                            className="form-control"
                             placeholder="Company Website" 
+                            defaultValue ={(userofficeaddress != null && userofficeaddress.company_website) ? userofficeaddress.company_website :''}
                             type="text" 
                             tabindex="1" 
                             autofocus
                             name="company_website"
                             ref={register({
-                                required: "Required"
+                                
                             })}
                         />
                         <small className="text-danger">{errors.company_website?.type == "required" && "Company Website is required"}</small>
@@ -160,18 +174,20 @@ const OfficeInfo = (props) =>
                 </div>
 
     
-                <div className="row">
+                <div className="row" style={{marginTop:20}}>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                             <select 
+                                    className="form-control"
                                     name="country_id"
-                                    style={{color:'#777777'}}
+                                    style={{color:'#777777',backgroundColor:'#fff'}}
                                     onChange = {(text) => handleChange(text)}
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Select your Country</option>
+                                <option value ={userofficeaddress != null && userofficeaddress.country_id}>{(userofficeaddress != null && userofficeaddress.userofficecountry != null) ? userofficeaddress.userofficecountry.name : 'Select Country' } </option>
+                                {/* <option value ="">Select your Country</option> */}
                                     {
                                         countries != null &&
                                         countries.map((country) =>
@@ -186,14 +202,15 @@ const OfficeInfo = (props) =>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                     <fieldset>
                             <select 
+                                className="form-control"
                                 name="state_id"
                                 onChange = {(text) => handleState(text)}
-                                style={{color:'#777777'}}    
+                                style={{color:'#777777',backgroundColor:'#fff'}}    
                                 ref={register({
                                     required: "Required",
                                 })}
                             >
-                            <option value ="">Select your State</option>
+                            <option value ={userofficeaddress != null && userofficeaddress.state_id}>{(userofficeaddress != null && userofficeaddress.userofficestate != null) ? userofficeaddress.userofficestate.name : 'Select State'} </option>
                                 {
                                     states != null &&
                                     states.map((state) =>
@@ -206,17 +223,19 @@ const OfficeInfo = (props) =>
                     </div>
                    
                 </div>
-                <div className="row">
+                <div className="row" style={{marginTop:20}}>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                         <fieldset>
                                 <select 
+                                    className="form-control"
                                     name="city_id"
-                                    style={{color:'#777777'}}    
+                                    style={{color:'#777777',backgroundColor:'#fff'}}    
                                     ref={register({
                                         required: "Required",
                                     })}
                                 >
-                                <option value ="">Select your City</option>
+                                <option value ={userofficeaddress != null ? userofficeaddress.city_id : ''}>{(userofficeaddress != null && userofficeaddress.city != null) ? userofficeaddress.city.name : 'Select City' } </option>
+
                                     {
                                         cities != null &&
                                         cities.map((city) =>
@@ -230,11 +249,13 @@ const OfficeInfo = (props) =>
                     <div className="col-lg-6 col-sm-12 col-md-6">
                     <fieldset>
                        <input 
+                            className="form-control"
                             placeholder="Office Address" 
                             type="text" 
                             tabindex="1" 
                             autofocus
                             name="address"
+                            defaultValue ={(userofficeaddress != null && userofficeaddress.address) ? userofficeaddress.address :''}
                             ref={register({
                                 required: "Required"
                             })}
@@ -246,17 +267,20 @@ const OfficeInfo = (props) =>
                
                 
                 <fieldset>
-                <div className="row">
+                <div className="row" style={{marginTop:20}}>
                     <div className="col-lg-6">
 
                     </div>
                     <div className="col-lg-3">
-                     
                     </div>
                     <div className="col-lg-3">
-                       <button hidden={IsFetching} name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
+                    {
+                        isLoadingCities == false && isLoadingCountries == false && isLoadingState == false &&
+                        <button hidden={IsSubmitting} name="submit"  type="submit" className="btn btn-success" style={{backgroundColor:'rgb(255, 187, 56)', border:'none'}} id="" data-submit="...Sending">Save and Continue</button>
+
+                    }
                        <Loader
-								visible={IsFetching}
+								visible={IsSubmitting}
 								type="Puff"
 								color="#ffbb38"
 								height={30}
@@ -273,4 +297,4 @@ const OfficeInfo = (props) =>
     );
 }
 
-export default OfficeInfo;
+export default withRouter(OfficeInfo);

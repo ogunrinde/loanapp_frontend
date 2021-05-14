@@ -41,17 +41,18 @@ const Header = (props) => {
     const loantobedisbursed = useSelector(state => state.root.loantobedisbursed);
     const [isRequestSeen, setisRequestSeen] = useState(false);
     const [isloantobedisbursed, setisloantobedisbursed] = useState(false);
+    const route = useSelector(state => state.root.route);
+    //const user = useSelector(state => state.root.user);
 
 
     useEffect(() =>{
         //alert(IsLoggedIn);
         if(IsFetching == true) dispatch(requeststatus());
         if(IsLoggedIn == true){
-            dispatch(GetCompleteUserProfile());
             process();
         } 
 
-    },[props]);
+    },[bankdetail]);
 
     const showpending = () => {
         setisRequestSeen(true);
@@ -68,8 +69,9 @@ const Header = (props) => {
         props.history.push('/');
     }
 
-    const process = () => {
-        dispatch(GetpendingApprovals());
+    const process = async () => {
+        //await dispatch(GetCompleteUserProfile());
+        //await dispatch(GetpendingApprovals());
     }
 
     const SendAgain = async () => {
@@ -83,7 +85,7 @@ const Header = (props) => {
         //alert(JSON.stringify(data.code));
         setisSubmitting(true);
         await dispatch(VerifyPhone(data.code));
-        dispatch(GetCompleteUserProfile());
+        //dispatch(GetCompleteUserProfile());
         setisSubmitting(false);
         setverify_phone(false);
     }
@@ -120,7 +122,7 @@ const Header = (props) => {
                         {
                             IsLoggedIn == true && 
                             <div className="top-contact-info d-flex align-items-center">
-                                <Link to="/home" data-toggle="tooltip" data-placement="bottom" title="Hi User"><img src="img/core-img/placeholder.png" alt=""/> <span style={{textTransform:'capitalize'}}>Hi, {user.name}</span></Link>
+                                <Link to="/home" data-toggle="tooltip" data-placement="bottom" title="Hi User"><img src="img/core-img/placeholder.png" alt=""/> <span style={{textTransform:'capitalize'}}>Hi, {user != null && user.name}</span></Link>
                                 <Link onClick = {log} data-toggle="tooltip" data-placement="bottom" title="log out account"><img src="../../img/core-img/message.png" alt=""/> <span>Logout</span></Link>
                             </div>
                         }
@@ -162,22 +164,17 @@ const Header = (props) => {
 
 
         {
-            (userdetails == null ||
-            userhomeaddress == null ||
-            userofficeaddress == null ||
-            usersocialmedia == null ||
-            bankdetail == null) && <Notify />
+            route != '' && route != '/userprofile/verification' && <Notify />
         }
 
         {
-            userdetails != null && userhomeaddress != null && userofficeaddress != null && usersocialmedia != null &&
-            bankdetail != null && Object.keys(userdetails).length > 0 && userdetails.Is_phone_number_verified == 0 && isSubmitting == false &&
+            route != '' && route == '/userprofile/verification' &&
             <section className="footer-area section-padding-10-0">
                 <div className="">
                     <div>
                         <div style={{padding:20,color:'#fff',textAlign:'center'}}>
-                            Verify your Phone Number 
-                            <button onClick={PhoneVerify} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>Verify Now</button>
+                            Verify your Account 
+                            <Link to={route} style={{backgroundColor:"#ffbb38",marginLeft:7,color:'#fff',padding:5,borderRadius:5}}>Verify Now</Link>
                         </div>
                     </div>
                 </div>
@@ -297,9 +294,13 @@ const Header = (props) => {
                                     <li  className="dropdown">
                                         <Link to ='/sureVault'>Sure Vault</Link>
                                     </li>
-                                    <li className="dropdown">
-                                        <Link to ='/sureoffers'>Sure Offers</Link>
-                                    </li>
+                                    {
+                                        route == '' && user != null && Object.keys(user).length > 0 &&
+                                            <li className="dropdown">
+                                                <Link to ='/sureoffers'>Sure Offers</Link>
+                                            </li>
+                                    }
+                                    
 
                                     <li className="dropdown">
                                         <Link>Loan Marketplace</Link>
@@ -316,11 +317,20 @@ const Header = (props) => {
                                     <li className="dropdown">
                                         <Link>Peer 2 Peer</Link>
                                         <div class="dropdown-content">
-                                            <Link to = "/peer_borrower">Peer Borrower with Lender</Link>
-                                            <Link to ="/peer_lender">Peer Lender with Borrower</Link>
+                                            <Link to = "/peer_borrower">Lender</Link>
+                                            <Link to ="/peer_lender">Borrower</Link>
                                         </div>
                                     </li>
-                                    <li><Link to="/home">My Account</Link></li>
+                                    {
+                                        route == '' &&
+                                        <li><Link to="/home">My Account</Link></li>
+                                    }
+
+                                    {
+                                        route != '' &&
+                                        <li><Link to={route}>My Account</Link></li>
+                                    }
+                                    
                                     {/* <li><Link to="/profile">My Profile</Link></li> */}
                                 </ul>
                             </div>

@@ -255,6 +255,12 @@ ul.tabs li.current{
   padding-right: 0px; 
 }
 
+#withdraw{
+  height: 210px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
 
 .portfolio-box{
   border: 1px solid #ededed;
@@ -458,7 +464,7 @@ ul.tabs li.current{
     height: 42px;
     width: 35px;
   }
-  #request, #Edu-detail, #officeaddress, #vault{
+  #request, #Edu-detail, #officeaddress, #vault, #withdraw{
     height: auto;
   }
 }

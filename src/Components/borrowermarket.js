@@ -27,6 +27,7 @@ const BorrowerMarket = (props) =>
     const [IsFetching, setIsFetching ] = useState(false);
     const all_borrowers_request = useSelector(state => state.root.all_borrowers_requests);
     const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
+    const route = useSelector(state => state.root.route);
 
     // const connect = (lenderId, requestId, vaultId) => {
     //     setview_vault(true);
@@ -90,17 +91,18 @@ const BorrowerMarket = (props) =>
               <div id="contact">
               <div className="list-group">
                   {
+                      IsFetching == false &&
                       all_borrowers_request != null &&
                       all_borrowers_request.length > 0 &&
                       all_borrowers_request.map((request) => 
-                        <div class="list-group-item list-group-item-action disabled">
+                        <div class="list-group-item list-group-item-action disabled marketlist">
                             <div className="row">
-                                <div className="col-lg-2 col-sm-2 col-md-2 col-4">
+                                <div className="col-lg-3 col-sm-3 col-md-3 col-4" style={{marginRight:10}}>
                                    <div className="news-thumbnail">
                                      <img src="img/bg-img/7.jpg" alt=""/>
                                     </div>
                                 </div>    
-                                <div className="col-lg-7 col-sm-7 col-md-7 col-8 content">
+                                <div className="col-lg-5 col-sm-5 col-md-5 col-8 content">
                                     <div className="news-content">
                                         <p style={{textTransform:'capitalize'}}>{request.user.name}</p>
                                         <p style={{fontSize:14}}>NGN {request.requestAmount.toLocaleString()}</p>
@@ -113,10 +115,12 @@ const BorrowerMarket = (props) =>
                                     
                                     </div>
                                 </div>
-                                <div className="col-lg-3 col-sm-12 col-md-3">
+                                <div className="col-lg-4 col-sm-12 col-md-3">
                                        <div style ={{textAlign:'right'}}>
-                                       <button  name="submit" className="viewdetail" onClick ={() => ViewborrowerProfile(request)} type="submit"   id="" data-submit="...Sending">View Details</button>
-
+                                       {
+                                            IsLoggedIn == true && route == '' &&    
+                                            <button  name="submit" className="viewdetail" onClick ={() => ViewborrowerProfile(request)} type="submit"   id="" data-submit="...Sending">View Details</button>
+                                       }
                                        </div>
 
                                 </div>   

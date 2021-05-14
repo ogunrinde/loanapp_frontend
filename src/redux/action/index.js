@@ -19,7 +19,7 @@ export function userlogin(values)
     };
 }
 
-export function userRegister(values) 
+export function userRegister(values,props) 
 {
     return function(dispatch) {
       dispatch({type: FETCHING});  
@@ -33,6 +33,7 @@ export function userRegister(values)
         .then(async (response) => {
             if(response.data.status == 'success'){
                 dispatch({type:USER_REGISTER,payload:response.data.user});
+                props.history.push('/userprofile');
             }else{
                 dispatch({type:MESSAGE, payload:response.data.message});
             }

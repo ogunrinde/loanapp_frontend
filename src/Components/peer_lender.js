@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from './Header';
 import { Link } from 'react-router-dom';
 import Footer from './Footer';
@@ -17,14 +17,19 @@ const PeerLender = (props) =>
 {
     const dispatch = useDispatch();
     const IsFetching = useSelector(state => state.root.IsFetching);
+    const [ IsSubmitting, setIsSubmitting ] = useState(false);
     const { handleSubmit, register, errors } = useForm();
-    const onSubmit =  (data) => {
-         dispatch(PeerLenderToBorrower(data,props));
+    const IsLoggedIn = useSelector(state => state.root.IsLoggedIn);
+    const route = useSelector(state => state.root.route);
+    const onSubmit =  async (data,e) => {
+         setIsSubmitting(true);
+         await dispatch(PeerLenderToBorrower(data,props, e));
+         setIsSubmitting(false);
     }
     return(
         <div>
             <ReactNotification />
-            <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
+            {/* <section class="breadcrumb-area bg-img bg-overlay jarallax" style={{backgroundImage: `url('../../img/bg-img/13.jpg')`}}>
                 <div class="container h-100">
                     <div class="row h-100 align-items-center">
                         <div class="col-12">
@@ -35,19 +40,19 @@ const PeerLender = (props) =>
                         </div>
                     </div>
                 </div>
-            </section>
-            <section>
-            <div className="profilecontainer"> 
+            </section> */}
+            <section  style={{backgroundColor:'#f1f7f9',padding:20,paddingBottom:40}}>
+            <div className="profilecontainer peer"> 
               <div id="contact">
              <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Peer to Peer</h3>
                 <h4>Complete the Form Below</h4>
                 <div className="row">
                     <div className="col-lg-6 col-sm-12 col-md-6">
-                   
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Borrower Phone Number </label>
                     <fieldset>
                        <input
-                        placeholder="Borrower Phone Number"
+                        placeholder=""
                         type="number" 
                         name="mobile"
                         tabindex="1" 
@@ -60,10 +65,10 @@ const PeerLender = (props) =>
                     </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
-                   
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Amount Available </label>
                     <fieldset>
                        <input
-                        placeholder="Amount Available for Borrow"
+                        placeholder=""
                         type="number" 
                         name="fundamount"
                         tabindex="1" 
@@ -72,7 +77,7 @@ const PeerLender = (props) =>
                             required: "Required"
                           })}
                         />
-                        <small className="text-danger">{errors.requestamount?.type == "required" && "Amount Available is required"}</small>
+                        <small className="text-danger">{errors.fundAmount?.type == "required" && "Amount Available is required"}</small>
                     </fieldset>
                     </div>
             
@@ -80,9 +85,10 @@ const PeerLender = (props) =>
 
                 <div className="row">
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Min Interest per Month </label>    
                     <fieldset>
                     <input
-                        placeholder="Min Interest Rate"
+                        placeholder=""
                         type="number" 
                         name="minInterestperMonth"
                         tabindex="1" 
@@ -91,13 +97,14 @@ const PeerLender = (props) =>
                             required: "Required"
                           })}
                         />
-                        <small className="text-danger">{errors.minInterestRate?.type == "required" && "Minimum Interest Rate is required"}</small>
+                        <small className="text-danger">{errors.minInterestperMonth?.type == "required" && "Minimum Interest Rate is required"}</small>
                     </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Max Interest per Month </label>    
                     <fieldset>
                        <input
-                        placeholder="Max Interest Rate"
+                        placeholder=""
                         type="number" 
                         name="maxInterestperMonth"
                         tabindex="1" 
@@ -106,13 +113,14 @@ const PeerLender = (props) =>
                             required: "Required"
                           })}
                         />
-                        <small className="text-danger">{errors.maxInterestRate?.type == "required" && "Maximum Interest Rate is required"}</small>
+                        <small className="text-danger">{errors.maxInterestperMonth?.type == "required" && "Maximum Interest Rate is required"}</small>
                     </fieldset>
                     </div>
                 </div>
                
                 <div className="row">
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Available from </label>        
                     <fieldset>
                     <input
                         placeholder=""
@@ -128,6 +136,7 @@ const PeerLender = (props) =>
                     </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Available To </label>        
                     <fieldset>
                     <input
                         placeholder=""
@@ -146,9 +155,10 @@ const PeerLender = (props) =>
 
                 <div className="row">
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Min Loan Tenor in months</label>      
                     <fieldset>
                     <input
-                        placeholder="Min Loan Tenor in months"
+                        placeholder=""
                         type="number" 
                         name="minloantenor"
                         tabindex="1" 
@@ -163,9 +173,10 @@ const PeerLender = (props) =>
                     </fieldset>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-6">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Max Loan Tenor in months</label>   
                     <fieldset>
                     <input
-                        placeholder="Max Loan Tenor in months"
+                        placeholder=""
                         type="number" 
                         name="maxloantenor"
                         tabindex="1" 
@@ -183,6 +194,7 @@ const PeerLender = (props) =>
                 <div className="row">
                    
                     <div className="col-lg-12 col-sm-12 col-md-12">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Are you will to pay for Credit Bereau</label> 
                         <fieldset>
                         <select 
                             name="requiredcreditBereau" 
@@ -192,7 +204,7 @@ const PeerLender = (props) =>
                                 required: "Required"
                               })}
                         >
-                            <option value="">Are you will to pay for Credit Bereau</option>
+                            <option value=""></option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select> 
@@ -210,10 +222,14 @@ const PeerLender = (props) =>
                           
                         </div>
                         <div className="col-lg-3">
-                        <button name="submit" hidden = {IsFetching}  type="submit" id="" data-submit="...Sending">Submit Request</button>
+                        {
+                            IsLoggedIn == true && route == '' &&
+                            <button name="submit" hidden = {IsSubmitting}  type="submit" id="" data-submit="...Sending">Submit Request</button>
+
+                        }    
                         <div style={{width:'100%',textAlign:'center'}}>
                         <Loader
-								visible={IsFetching}
+								visible={IsSubmitting}
 								type="Puff"
 								color="#ffbb38"
 								height={30}

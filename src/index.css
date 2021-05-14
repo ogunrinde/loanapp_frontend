@@ -1,0 +1,33 @@
+.profilea {
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    background: #ffbb38;
+    color: #FFF;
+    margin: 0 0 5px;
+    padding: 10px;
+    font-size: 15px;
+}
+.marketlist{
+    margin-bottom:10px;
+    width:80% !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+.peer{
+    width: 70%;
+}
+
+@media screen and (max-width : 768px){
+
+    .marketlist{
+        margin-bottom:10px;
+        width:100% !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .peer{
+        width: 98%;
+    }
+  }

@@ -28,15 +28,16 @@ const MarketPlacedetailsForBorrower = (props) => {
     const [IsConnecting, setIsConnecting] = useState(false);
     const request = props.request;
     const month = useSelector(state => state.root.month);
-    const LoanRequestData = useSelector(state => state.root.loanrequest);
+	const LoanRequestData = useSelector(state => state.root.loanrequest);
+	const [IsSubmittingForm, setIsSubmittingForm] = useState(false);
 
 	// const onSubmit = data => {
     //     dispatch(UpdateSuredeal(data));
 	// }
     useEffect(() =>{
-        getUserInformation();
-        dispatch(GetUserLoanRequest());
-    },[props.borrowerId]);
+        //getUserInformation();
+        //dispatch(GetUserLoanRequest());
+    },[props.request]);
     if(Object.keys(userprofile).length > 0)
     {
 		//console.log(request);
@@ -77,247 +78,161 @@ const MarketPlacedetailsForBorrower = (props) => {
         setIsConnecting(false);
     }
 
-    const FormatDate = (date) => {
-        let d = date.split('-');
-        let day = d[2];
-        let mth = month[parseInt(d[1])-1];
-        let year = d[0];
-        return `${day} ${mth}, ${year}`;
-    }
+	
+	const handleChange = (event) => {
+		if(event.target.name == 'fundAmount' && parseFloat(event.target.value) < props.request.requestAmount)
+		{
+			//alert(event.target.name);
+			Error("Invalid",`You need to fund your wallet with NGN ${props.request.requestAmount}`);
+			return false;
+		}
+	}
     
-    const onSubmit = data => {
-        dispatch(UpdateSuredeal(data));
+    const onSubmit = async (request) => {
+		//dispatch(UpdateSuredeal(data));
+		setIsSubmittingForm(true);
+		let data = {borrower_request_id : props.request.id, borrower_id:props.request.user.id, connection_type : 'lender connect'};
+		//alert(JSON.stringify(data));
+        await dispatch(ConnectwithBorrower(data));
+        setIsSubmittingForm(false);
 	}
     return(
 		<div>
-		{	
-		 Object.keys(userprofile).length > 0 &&	
         <div hidden = {IsFetchingUserInformation} className="profile-main">
 		<ReactNotification />	
 		<div className="profile-header">
-			<div className="user-detail">
-				<div className="user-image">
-					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
-				</div>
-				<div className="user-data">
-                    <h2 style={{marginBottom:7}}>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>
-		{/* <span className="post-label">{userofficestate}</span>
-		<span className="post-label">{userprofile.}</span>
-					<span className="post-label">AMA</span>  */}
-				<p style={{marginBottom:7}}>{userprofile.homeaddress.address}</p>
-                    <p>
-                    <Loader
-                            visible={IsConnecting}
-                            type="Puff"
-                            color="#ffbb38"
-                            height={30}
-                            width={30}
-                            timeout= {0} //3 secs
-                    
-                        />    
-                    <button hidden={IsConnecting} onClick = {connectBorrower} style={{padding:5,color:'#fff',background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Connect with Borrower Now</button>
-					</p>
-				</div>
-				
-			</div>
-			<div className="tab-panel-main">
-				<ul className="tabs">
-                    <li className="tab-link current" data-tab="userdetails">Basic Information</li>
-					<li className="tab-link" data-tab="officeaddress">Office Address</li>
-					<li className="tab-link" data-tab="Edu-detail">Bank Details</li>
-                    <li className="tab-link" data-tab="vault" onClick = {vault}>Borrower Request </li>
-				</ul>
-                <div id="userdetails" className="tab-content current">
-					<div className="bio-box">
-						<div className="heading">
-							<p>Surname</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.surname}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Firstname</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.firstname}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Middlename</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.middlename}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Email</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.email}
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Gender</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.gender}
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Mobile Number 1</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.mobile1}
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Mobile Number 2</p>
-						</div>
-						<div className="desc">
-							{userprofile.userdetails.mobile2}
-						</div>
-					</div>
-					
-				</div>
-				
-				<div id="officeaddress" className="tab-content">
-				
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Employment Status</p>
-						</div>
-						<div className="desc">
-							{userprofile.officeaddress.employmentstatus}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Company Name</p>
-						</div>
-						<div className="desc">
-							{userprofile.officeaddress.company_name}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Contact Number</p>
-						</div>
-						<div className="desc">
-							{userprofile.officeaddress.contact_number}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Office Contact Website</p>
-						</div>
-						<div className="desc">
-							{userprofile.officeaddress.contact_website}
-						</div>
-					</div>
-					
-				</div>
-				
-				<div id="Edu-detail" className="tab-content">
-                    <div className="bio-box">
-						<div className="heading">
-							<p>BVN</p>
-						</div>
-						<div className="desc">
-							{userprofile.bankdetails.bvn}
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Bank Name</p>
-						</div>
-						<div className="desc">
-							{userprofile.bankdetails.bankname}
-						</div>
-					</div>
-					<div className="bio-box">
-						<div className="heading">
-							<p>Account Number</p>
-						</div>
-						<div className="desc">
-							{userprofile.bankdetails.accountnumber}
-						</div>
-					</div>
-               
-                </div>
-
-                <div id="vault" className="tab-content">
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Request Amount (NGN)</p>
-						</div>
-						<div className="desc">
-                           {props.request.requestAmount.toLocaleString()}
-						</div>
-					</div>
-                  
-					<div className="bio-box">
-						<div className="heading">
-							<p>Minimum Interest</p>
-						</div>
-						<div className="desc">
-                           {props.request.minInterestRate}%
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Maximum Interest</p>
-						</div>
-						<div className="desc">
-                           {props.request.maxInterestRate}%
-						</div>
-					</div>
-                    <div className="bio-box">
-						<div className="heading">
-							<p>Repayment Plan</p>
-						</div>
-						<div className="desc">
-                          {props.request.repaymentplan}
-						</div>
-					</div>
-
-                  
-               
-                    <div style={{textAlign:'center',marginTop:'25%'}}>
-                        <Loader
-                            visible={IsGettingVault}
-                            type="Puff"
-                            color="#ffbb38"
-                            height={30}
-                            width={30}
-                            timeout= {0} //3 secs
-                    
+			
+			<div className="">
+			<section>
+            <div className="profilecontainer"> 
+              <div id="contact"> 
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="row">
+                    <div className ="col-lg-12 col-sm-12 col-md-12">
+                       <h3>Connect with Borrower</h3>
+                       <h4>Complete the Form Below</h4>
+					   <p className="text-danger" style={{fontSize:12}}>Amount Borrower Needs : NGN {props.request.requestAmount}</p>
+                    </div>
+                </div>  
+                
+                <div className="row" style={{marginTop:20}}>
+                    <div className="col-lg-12 col-sm-12 col-md-12">
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Amount </label>
+                    <fieldset>
+                       <input
+					    onKeyUp = {handleChange}
+                        placeholder=""
+                        type="number" 
+                        min="1"
+						name="fundAmount"
+						readOnly="true"
+						tabindex="1" 
+						defaultValue = {props.request.requestAmount}
+						style={{padding:7}}
+                        autofocus
+                        ref={register({
+                            required: "Required",
+                            min:1,
+                            max:999999999999999
+                          })}
                         />
+                        <small className="text-danger">{errors.fundAmount?.type == "required" && "Amount is required"}</small>
+                    </fieldset>
                     </div>
                 </div>
+
+              
+               
+                <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-md-6">
+					<label style={{color:'#777777',fontSize:14,marginBottom:7}}>Max Interest Rate per Month</label>	
+                     
+                    <fieldset>
+                       <input
+                        onKeyUp = {handleChange}
+                        type="number" 
+						min="1"
+						style={{padding:7}}
+                        name="maxInterestperMonth"
+						tabindex="1" 
+						readOnly="true"
+						defaultValue ={props.request.maxInterestRate}
+                        autofocus
+                        ref={register({
+                            required: "Required",
+                            min:1,
+                            max:999999999999999
+                          })}
+                        />
+                        <small className="text-danger">{(errors.maxInterestRate?.type == "min" || errors.maxInterestRate?.type =="max") && "Invalid Input"}</small>
+                        <small className="text-danger">{errors.maxInterestRate?.type == "required" && "Maximum Interest Rate is required"}</small>
+                    </fieldset>
+                    </div>
+                    <div className="col-lg-12 col-sm-12 col-md-12">
+					<label style={{color:'#777777',fontSize:14,marginBottom:7}}>Max Loan Tenor (in Months)</label>	
+					<fieldset>
+                       <input
+                        type="number" 
+						min="1"
+						style={{padding:7}}
+                        name="maxloantenor"
+						tabindex="1" 
+						readOnly="true"
+						defaultValue ={props.request.loanperiod}
+                        autofocus
+                        ref={register({
+                            required: "Required",
+                            min:1,
+                            max:999999999999999
+                          })}
+                        />
+                        <small className="text-danger">{(errors.maxloantenor?.type == "min" || errors.maxloantenor?.type =="max") && "Invalid Input"}</small>
+                        <small className="text-danger">{errors.maxloantenor?.type == "required" && "Maximum Loan Tenor Rate is required"}</small>
+                    </fieldset>
+                    </div>
+                </div>
+               
+                    <fieldset>
+                    <div className="row" style={{marginTop:30}}>
+                        <div className="col-lg-3">
+    
+                        </div>
+                        <div className="col-lg-3">
+                          
+                        </div>
+                        <div className="col-lg-6">
+                            
+                                
+                                <button name="submit" hidden = {IsSubmittingForm}  type="submit" id="" data-submit="...Sending">Submit Request</button>
+                              
+                            <div style={{width:'100%',textAlign:'center'}}>
+                            <Loader
+								visible={IsSubmittingForm}
+								type="Puff"
+								color="#ffbb38"
+								height={30}
+								width={30}
+								timeout= {0} //3 secs
+						
+							/>
+                        </div>    
+                        </div>
+                    </div>    
+                    
+                    </fieldset>
+            </form>
+    
+                 
+              </div>
+            </div>    
+               
+            </section>	
 				
 			</div>
 		</div>
 	    
 		</div>
-		}
-		<div style={{textAlign:'center',marginTop:'35%'}}>
-			<Loader
-				visible={IsFetchingUserInformation}
-				type="Puff"
-				color="#ffbb38"
-				height={30}
-				width={30}
-				timeout= {0} //3 secs
 		
-			/>
-		</div>
 		
 		</div>
     );

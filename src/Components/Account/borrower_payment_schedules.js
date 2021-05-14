@@ -2,7 +2,7 @@ import React, {useEffect, useState } from 'react';
 import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import $ from 'jquery';
 import '../../css/account/custom.css';
-import { GetBorrowerPaymentSchedules, requeststatus } from '../redux/action/index';
+import { GetBorrowerPaymentSchedules, requeststatus, UpdatePayment } from '../redux/action/index';
 import Loader from 'react-loader-spinner';
 import ReactNotification from 'react-notifications-component';
 import 'react-notifications-component/dist/theme.css';
@@ -10,6 +10,8 @@ import { store } from 'react-notifications-component';
 import { useForm } from 'react-hook-form';
 import '../../css/css/profile.css';
 import { parse } from '@fortawesome/fontawesome-svg-core';
+import { usePaystackPayment, PaystackButton,PaystackConsumer } from 'react-paystack';
+import { PAYSTACK_APIKEY } from '../redux/action/constants';
 
 const BorrowerPaymentSchedules = (props) => {
 
@@ -21,11 +23,37 @@ const BorrowerPaymentSchedules = (props) => {
     let analytics = useSelector(state => state.root.paymentanalytics);
 	const [IsSubmitting, setIsSubmitting] = useState(false);
     const request = props.request;
+    const userdetails = useSelector(state => state.root.userbasicdetails);
     //const [analytics, setanalytics] = useState({}); 
 
     useEffect(() =>{
 		getpaymentSchedules();
     },[props.request]);
+
+    const componentProps = {
+		reference : (new Date()).getTime(),
+		email: userdetails.email,
+		amount: 100 * (analytics.todaydue + analytics.overdues),
+		publicKey: PAYSTACK_APIKEY,
+		text:'Transfer',
+		onSuccess: (response) => {
+            CreateRepayment(response);
+			//UpdateDisbursed(response);
+			//setIsDisbursed(true);
+			//alert(JSON.stringify(response));
+			console.log(response);
+		},
+		onClose: () => {
+			//window.location.href = '/loantobedisbursed';
+		}
+    };
+    
+    const CreateRepayment = async (response) => {
+        setIsSubmitting(true);
+        let data = {response: response, reference:response.reference};
+        await dispatch(UpdatePayment(data,request.id));
+        setIsSubmitting(false);
+    }
 
 
 	const getpaymentSchedules = async () => {
@@ -55,7 +83,7 @@ const BorrowerPaymentSchedules = (props) => {
                     <div className="col-lg-3 col-md-6 col-sm-6">
                         <div className="single-features">
                             <div className="f-icon">
-                                <h3>{analytics.overdues != undefined ? analytics.overdues : 0}</h3>
+                                <h3>{analytics.overdues != undefined ? analytics.overdues.toFixed(2) : 0}</h3>
                             </div>
                             <h6>Amount OverDue</h6>
                             
@@ -89,7 +117,25 @@ const BorrowerPaymentSchedules = (props) => {
             </div>
         </section>    
         }
-        <div hidden = {IsFetching} className="table-responsive ">
+        <section>
+          
+        {
+            analytics != null && (analytics.overdues + analytics.todaydue) > 0 &&
+            <div>
+            <div>
+                You have NGN { analytics.overdues != undefined ? analytics.overdues.toFixed(2) : 0 } Overdue payment and NGN {analytics.todaydue != undefined ? analytics.todaydue.toFixed(2) : 0} for today.
+            </div>    
+            <div className="" style={{marginBottom:10}}>
+                <PaystackConsumer {...componentProps }>
+                    {({initializePayment}) => <button onClick = {() => initializePayment()} style={{padding:5,marginTop:20,color:'#fff',marginLeft:7,background:'linear-gradient(90deg, #ffba00 0%, #ff6c00 100%)',borderRadius:3}}>Pay Now</button>}
+                </PaystackConsumer>
+            </div>   
+            </div>  
+        
+        } 
+        
+        </section>
+        <div hidden = {IsFetching} className="table-responsive" style={{clear:'both'}}>
                     <table className="table">
                         <thead>
                             <tr className="filter-bar" style={{color:'#fff'}}>

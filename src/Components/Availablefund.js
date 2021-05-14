@@ -18,25 +18,28 @@ const Availablefund = (props) => {
     const countries = useSelector(state => state.places.countries);
     const states = useSelector(state => state.places.states);
     const IsFetching = useSelector(state => state.root.IsFetching);
+    const route = useSelector(state => state.root.route);
+    const user = useSelector(state => state.root.user);
     const onSubmit = async (data, e) => {
         await dispatch(Createvault_availablefund(data));
         props.nextStep();
         //e.target.reset();
     }
     return (
-        <div className="profilecontainer"> 
+        <div className="profilecontainer peer"> 
               <div id="contact">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <h3>Create Vault</h3>
                 <span>Complete the Information Below</span>
-                <div className="row" style={{marginTop:20,marginBottom:20}}>
+                <div className="row" style={{marginTop:20,marginBottom:10}}>
                     <div className="col-lg-12 col-sm-12 col-md-12">
-                    <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Fund Available </p>    
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Fund Available </label>    
                     <fieldset>
                         
                        <input
                         type="number" 
                         name="fundamount"
+                        style={{color:'#777777'}}
                         min="1"
                         tabindex="1" 
                         autofocus
@@ -54,12 +57,13 @@ const Availablefund = (props) => {
                 </div>
                 <div className="row" style={{marginBottom:20}}>
                     <div className="col-lg-6 col-sm-12 col-md-3">
-                        <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Fund Available From </p> 
+                    <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Fund Available From</label>  
                         <fieldset>
                        
                         <input 
                             type="date" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="availablefrom"
                             ref={register({
@@ -71,10 +75,11 @@ const Availablefund = (props) => {
                     </div>
                     <div className="col-lg-6 col-sm-12 col-md-3">
                     <fieldset>
-                       <p style={{color:'#777777',fontSize:16,marginBottom:7}}>Fund Available To </p>  
+                      <label style={{color:'#777777',fontSize:14,marginBottom:7}}>Fund Available To</label>  
                        <input 
                             type="date" 
                             tabindex="1" 
+                            style={{color:'#777777'}}
                             autofocus
                             name="availableto"
                             ref={register({
@@ -96,11 +101,7 @@ const Availablefund = (props) => {
                     </div>
                     <div className="col-lg-3">
                     {
-                        (userdetails != null &&
-                            userhomeaddress != null &&
-                            userofficeaddress != null &&
-                            usersocialmedia != null &&
-                            bankdetail != null) &&  <button name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
+                        (user != null && Object.keys(user).length > 0 && route == '') &&  <button name="submit"  type="submit" id="" data-submit="...Sending">Next</button>
 
                     }   
                     </div>

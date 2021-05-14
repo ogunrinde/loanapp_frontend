@@ -78,6 +78,7 @@ const BorrowerApprovedRequest = (props) =>
                             <tr className="filter-bar" style={{color:'#fff'}}>
                                 <th scope="col">S/N</th>
                                 <th scope="col">Lender Name</th>
+                                <th scope="col">Request Amount</th>
                                 <th scope="col">Repayment Plan</th>
                                 <th scope="col">Loan Period</th>
                                 <th scope="col">Request Date</th>
@@ -96,6 +97,14 @@ const BorrowerApprovedRequest = (props) =>
                                     
                                         <div className="media-body">
                                             {request.lender.name}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div className="media">
+                                    
+                                        <div className="media-body">
+                                            {request.request.requestAmount}
                                         </div>
                                     </div>
                                 </td>

@@ -33,6 +33,9 @@ import LenderOverDues from './Account/overdues_lender';
 import RepaymentforBorrower from './Account/repaymentforborrower';
 import BorrowerRequestList from './Account/borrowerviewpaymentschedules';
 import LenderDisbursedList from './Account/lenderviewpaymentschedules';
+import VaultWithdrawal from './Account/vaultwaithdrawal';
+import RepaymentWithdrawal from './Account/repaymentwithdrawal';
+import Scroll from '../Components/scroll';
 //import SidebarContainer from "./Sidebar";
 
 import {
@@ -45,9 +48,16 @@ import {
   } from "react-router-dom";
 
 
+
 function ProcessRequest()
 {
 	let { routerequest } = useParams();
+	const route = useSelector(state => state.root.route);
+	// if(route != '') 
+	// {
+	// 	Error('Access Denied', 'Kindly Complete your Profile');
+	// 	window.location.href = `${route}`;
+	// }
 	if(routerequest == 'approvedloans') return (<ApprovedLoans />);
 	else if(routerequest == 'loantobedisbursed') return (<Loantodisbursed />);
 	else if(routerequest == 'loan_disbursed') return (<Loandisbursed />);
@@ -65,7 +75,9 @@ function ProcessRequest()
 	else if(routerequest == 'overdues_lender') return (<LenderOverDues />);
 	else if(routerequest == 'repayment_borrower') return (<RepaymentforBorrower />);
 	else if(routerequest == 'paymentschedules') return (<BorrowerRequestList />);
-    else if(routerequest == 'paymentschedules_lender') return (<LenderDisbursedList />);
+	else if(routerequest == 'paymentschedules_lender') return (<LenderDisbursedList />);
+	else if(routerequest == 'vault_withdrawal') return (<VaultWithdrawal />);
+	else if(routerequest == 'repayment_withdrawal') return (<RepaymentWithdrawal />);
 	//else if(routerequest == 'closed_repayment_borrower') return (<ClosedRepaymentforBorrower />);
 	// else if(routerequest == 'overdues_lender') return (<OverduesforLender />);
 	// else if(routerequest == 'open_repayment_borrower') return (<OpenRepaymentforBorrower />);
@@ -150,7 +162,18 @@ const Home = (props) =>
 	let { path, url } = useRouteMatch();
 	const dispatch = useDispatch();
 	const IsFetching = useSelector(state => state.root.IsFetching);
+	const userdetails = useSelector(state => state.root.userbasicdetails);
+    const userhomeaddress = useSelector(state => state.root.userHomeAddress);
+    const userofficeaddress = useSelector(state => state.root.userOfficeAddress);
+    const usersocialmedia = useSelector(state => state.root.userSocialMediaAccounts);
+    const bankdetail = useSelector(state => state.root.userBankInformation);
 	const [sidebarOpen, setsidebarOpen] = useState(false);
+	const route = useSelector(state => state.root.route);
+	if(route != '') 
+	{
+		Error('Access Denied', 'Kindly Complete your Profile');
+		//window.location.href = `${route}`;
+	}
 	
 
 	const setdata = () => {
@@ -159,7 +182,8 @@ const Home = (props) =>
 	
     return(
 		<Router>
-        <div>			
+        <div>	
+		<Scroll />			
 		<div className="container analytic_container">
 		<div className ="mobile">
 			<nav  className="navbar navbar-expand-lg navbar-light" style={{backgroundColor:'#fff'}}>
@@ -207,12 +231,26 @@ const Home = (props) =>
 								<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/open_repayment_lender`}>Repayment</Link></li>
 							</ul>
 					</li>
+					<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list"><a data-toggle="collapse" href="#withdrawal" aria-expanded="false" aria-controls="withdrawal"><span
+								 className="lnr lnr-arrow-right"></span>Withdrawal</a>
+							<ul className="collapse" id="repayment_lender" data-toggle="collapse" aria-expanded="false" aria-controls="withdrawal">
+								<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/vault_withdrawal`}>Vault Withdrawal</Link></li>
+								<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/repayment_withdrawal`}>Repayment Withdrawal</Link></li>
+					        </ul>
+					</li>
 					<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list"><a data-toggle="collapse" href="#profile" aria-expanded="false" aria-controls="profile"><span
 								 className="lnr lnr-arrow-right"></span>Profile</a>
 						<ul className="collapse" id="profile" data-toggle="collapse" aria-expanded="false" aria-controls="profile">
-							<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/profile`} href="#">Complete your Profile</Link></li>
-							<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/myprofile`} href="#">My Profile</Link></li>
-							<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/verify`} href="#">Verification</Link></li>
+						        {/* {
+									(userdetails != null && Object.keys(userdetails).length == 0 &&
+									userhomeaddress != null && Object.keys(userhomeaddress).length == 0 &&
+									userofficeaddress != null && Object.keys(userofficeaddress).length == 0 &&
+									usersocialmedia != null && Object.keys(usersocialmedia).length == 0 &&
+									bankdetail != null && Object.keys(bankdetail).length == 0) &&
+									<li className="main-nav-list child"><Link to={`${url}/profile`}>Complete your Profile</Link></li>
+								} */}
+							<li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/myprofile`}>My Profile</Link></li>
+							{/* <li style={{textAlign:'center',paddingBottom:10,paddingTop:10}} className="main-nav-list child"><Link to={`${url}/verify`}>Verification</Link></li> */}
 						</ul>
 					</li>
 	
@@ -300,12 +338,28 @@ const Home = (props) =>
 							</ul>
 						</li>
 
+						<li className="main-nav-list"><a data-toggle="collapse" href="#withdrawal" aria-expanded="false" aria-controls="withdrawal"><span
+								 className="lnr lnr-arrow-right"></span>Withdrawal</a>
+							<ul className="collapse" id="repayment_lender" data-toggle="collapse" aria-expanded="false" aria-controls="withdrawal">
+								<li className="main-nav-list child"><Link to={`${url}/vault_withdrawal`}>Vault Withdrawal</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/repayment_withdrawal`}>Repayment Withdrawal</Link></li>
+					        </ul>
+						</li>
+
 						<li className="main-nav-list"><a data-toggle="collapse" href="#profile" aria-expanded="false" aria-controls="profile"><span
 								 className="lnr lnr-arrow-right"></span>Profile</a>
 							<ul className="collapse" id="profile" data-toggle="collapse" aria-expanded="false" aria-controls="profile">
-							    <li className="main-nav-list child"><Link to={`${url}/profile`} href="#">Complete your Profile</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/myprofile`} href="#">My Profile</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/verify`} href="#">Verification</Link></li>
+								{/* {
+									(userdetails != null && Object.keys(userdetails).length == 0 &&
+									userhomeaddress != null && Object.keys(userhomeaddress).length == 0 &&
+									userofficeaddress != null && Object.keys(userofficeaddress).length == 0 &&
+									usersocialmedia != null && Object.keys(usersocialmedia).length == 0 &&
+									bankdetail != null && Object.keys(bankdetail).length == 0) &&
+									<li className="main-nav-list child"><Link to={`${url}/profile`}>Complete your Profile</Link></li>
+								} */}
+							    
+								<li className="main-nav-list child"><Link to={`${url}/myprofile`}>My Profile</Link></li>
+								{/* <li className="main-nav-list child"><Link to={`${url}/verify`}>Verification</Link></li> */}
 							</ul>
 						</li>
 	
@@ -391,12 +445,27 @@ const Home = (props) =>
 							</ul>
 						</li>
 
+						<li className="main-nav-list"><a data-toggle="collapse" href="#withdrawal" aria-expanded="false" aria-controls="withdrawal"><span
+								 className="lnr lnr-arrow-right"></span>Withdrawal</a>
+							<ul className="collapse" id="withdrawal" data-toggle="collapse" aria-expanded="false" aria-controls="withdrawal">
+								<li className="main-nav-list child"><Link to={`${url}/vault_withdrawal`}>Vault Withdrawal</Link></li>
+								<li className="main-nav-list child"><Link to={`${url}/repayment_withdrawal`}>Repayment Withdrawal</Link></li>
+					        </ul>
+						</li>
+
 						<li className="main-nav-list"><a data-toggle="collapse" href="#profile" aria-expanded="false" aria-controls="profile"><span
 								 className="lnr lnr-arrow-right"></span>Profile</a>
 							<ul className="collapse" id="profile" data-toggle="collapse" aria-expanded="false" aria-controls="profile">
-							    <li className="main-nav-list child"><Link to={`${url}/profile`} href="#">Complete your Profile</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/myprofile`} href="#">My Profile</Link></li>
-								<li className="main-nav-list child"><Link to={`${url}/verify`} href="#">Verification</Link></li>
+							    {/* {
+									(userdetails != null && Object.keys(userdetails).length == 0 &&
+									userhomeaddress != null && Object.keys(userhomeaddress).length == 0 &&
+									userofficeaddress != null && Object.keys(userofficeaddress).length == 0 &&
+									usersocialmedia != null && Object.keys(usersocialmedia).length == 0 &&
+									bankdetail != null && Object.keys(bankdetail).length == 0) &&
+									<li className="main-nav-list child"><Link to={`${url}/profile`}>Complete your Profile</Link></li>
+								} */}
+								<li className="main-nav-list child"><Link to={`${url}/myprofile`}>My Profile</Link></li>
+								{/* <li className="main-nav-list child"><Link to={`${url}/verify`}>Verification</Link></li> */}
 							</ul>
 						</li>
 

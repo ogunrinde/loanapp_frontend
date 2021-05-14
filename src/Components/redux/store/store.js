@@ -13,7 +13,7 @@ const reducers = combineReducers({
 });
 
 const persistConfig = {
-    key: 'root',
+    key: 'loanapp',
     storage
 };
 

@@ -9,6 +9,7 @@ import 'react-notifications-component/dist/theme.css';
 import { store } from 'react-notifications-component';
 import { useForm } from 'react-hook-form';
 import '../../css/css/profile.css';
+import { IMAGEPATH } from '../redux/action/constants';
 
 const PendingLoanRequest = (props) => {
 
@@ -30,7 +31,7 @@ const PendingLoanRequest = (props) => {
     useEffect(() =>{
 		getUserInformation();
 		//alert(JSON.stringify(request));
-    },[]);
+    },[request]);
     if(Object.keys(userprofile).length > 0)
     {
 		//console.log(request);
@@ -57,6 +58,7 @@ const PendingLoanRequest = (props) => {
 
 	const updatestatus = async (status,connectId) => {
 		setIsSubmitting(true);
+		//alert(connectId);
 		await dispatch(UpdateLoanRequestStatus(status,connectId,props.request.borrower_id,request.request.id));
 		setIsSubmitting(false);
 	}
@@ -69,7 +71,7 @@ const PendingLoanRequest = (props) => {
 		<div className="profile-header">
 			<div className="user-detail">
 				<div className="user-image">
-					<img src="http://nicesnippets.com/demo/up-profile.jpg"/>
+				   <img src={`${IMAGEPATH}${userprofile.userdetails.profileImage}`}/>
 				</div>
 				<div className="user-data">
 					<h2>{userprofile.userdetails.surname} {userprofile.userdetails.firstname}</h2>

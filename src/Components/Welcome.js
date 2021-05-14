@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import SureRequest from './sureRequest';
@@ -9,6 +9,11 @@ import { Link } from 'react-router-dom';
 
 
 const Welcome = () => {
+   
+
+    useEffect(() => {
+     
+    },[]);
     return (
         <div>
            
